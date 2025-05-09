@@ -1,0 +1,229 @@
+﻿/* Global resets & box sizing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Overall page layout: sidebar + main */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Sidebar styling */
+.sidebar {
+  width: 200px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.sidebar .logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sidebar .logo img {
+  max-width: 100px;
+}
+
+.sidebar .logo h2 {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.nav-links {
+  list-style: none;
+}
+
+.nav-links li {
+  margin: 1rem 0;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.nav-links li.active a {
+  color: #5E4AE3;
+  font-weight: bold;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1.2rem;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+}
+
+.topbar .menu-links a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.topbar .user-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-profile {
+  position: relative;    /* anchor for the dropdown */
+  display: inline-flex;  /* keep toggle & dropdown in same context */
+  align-items: center;
+}
+
+
+
+/* the logout menu */
+.profile-dropdown {
+  position: absolute;
+  top: 100%;    /* immediately below the toggle button */
+  right: 0;     /* align to right edge */
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  display: none;           /* starts hidden */
+  z-index: 1000;
+}
+
+.profile-dropdown li {
+  padding: 0.5rem 1rem;
+}
+.profile-dropdown li:hover {
+  background: #f5f5f5;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font: inherit;
+  color: #333;
+  cursor: pointer;
+}
+
+
+/* Dashboard header */
+.dashboard-header {
+  padding: 1.2rem;
+  background: #FDEDEF;
+}
+
+.dashboard-header h1 {
+  font-size: 1.5rem;
+  color: #C72C41;
+}
+
+/* Dashboard body: charts on left, KPIs on right */
+.dashboard-body {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-areas: "charts kpis";
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+}
+
+/* Charts grid */
+.charts-grid {
+  grid-area: charts;
+  display: grid;
+  grid-template-columns: 2fr 2fr;
+  grid-auto-rows: minmax(200px, auto);
+  gap: 1rem;
+}
+
+/* KPI storyboard column */
+.kpi-cards, .kpi-storyboards {
+  grid-area: kpis;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Storyboards title */
+.kpi-storyboards__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #333;
+  text-align: center;
+  width: 100%;
+}
+
+/* Each chart card */
+.chart-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1rem;
+  position: relative;
+}
+
+.chart-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.chart-card button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  border: none;
+  background: #5E4AE3;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Each KPI card */
+.kpi-card {
+  padding: 1rem;
+  border-radius: 8px;
+  height: 200px;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+}
+
+.kpi-card h4 {
+  margin-bottom: 0.5rem;
+}
+
+/* KPI color variants */
+.kpi-card.blue   { background: #6699CC; }
+.kpi-card.orange { background: #FFA56B; }
+.kpi-card.green  { background: #8FBC8F; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 0.8rem;
+  font-size: 0.8rem;
+  background: #F6E7FF;
+  border-top: 1px solid #ddd;
+}
