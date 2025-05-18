@@ -49,6 +49,9 @@ def home():
     # render the main dashboard HTML
     # note: make sure Pages/managerial-landing-dashboard.html exists
     return render_template("managerial-landing-dashboard.html")
+@app.route('/')
+def landing():
+  return render_template('website_landing_page.html')
 
 @app.route("/api/data")  # API endpoint for chart data
 def api_data():
