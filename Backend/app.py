@@ -22,8 +22,12 @@ DATA_PATH = os.path.join(BASE_DIR, "dummy_data.xlsx")
 app = Flask(
     __name__,
     static_folder="static",
+    static_url_path="/static",
     template_folder="templates"
 )
+@app.route("/")
+def home():
+    return "<h1>HELLO FLASK!</h1>" #testing
 
 #  Home / Dashboard
 @app.route("/")
