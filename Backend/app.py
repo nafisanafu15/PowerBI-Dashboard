@@ -25,9 +25,7 @@ app = Flask(
     static_url_path="/static",
     template_folder="templates"
 )
-@app.route("/")
-def home():
-    return "<h1>HELLO FLASK!</h1>" #testing
+
 
 #  Home / Dashboard
 @app.route("/")
@@ -84,4 +82,4 @@ def inject_static():
 # Main
 if __name__ == "__main__":
     # if you need custom host/port, change here
-    app.run(debug=True)
+    app.run(debug=True, port=5050)
