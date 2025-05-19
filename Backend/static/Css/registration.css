@@ -1,0 +1,190 @@
+/*------------------------------------------------------------------
+  RESET & BASE
+-------------------------------------------------------------------*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/*------------------------------------------------------------------
+  NAVBAR
+-------------------------------------------------------------------*/
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background: #fff;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+.navbar-logo img {
+  width: 200px;
+  height: auto;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+.nav-links {
+  display: flex;
+  gap: 12px;
+  margin-right: 20px;
+}
+.nav-links a {
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+}
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+  background: #e0e0e0;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.nav-buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+/*------------------------------------------------------------------
+  MAIN CONTENT WRAPPER (with background image)
+-------------------------------------------------------------------*/
+.main-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* use your full static path here */
+  background-image: url('/static/Assets/background.png');
+  background-size: cover;
+  background-position: center -90px;
+  background-repeat: no-repeat;
+  padding-top: 100px;
+}
+
+/*------------------------------------------------------------------
+  TITLE BOX
+-------------------------------------------------------------------*/
+.title-box {
+  background: #fff;
+  padding: 8px 16px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #050404;
+  box-shadow: 0 0 8px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.title-box h3 {
+  font-size: 16px;
+  color: #444;
+}
+
+/*------------------------------------------------------------------
+  REGISTRATION FORM
+-------------------------------------------------------------------*/
+.container {
+  background: #fff;
+  padding: 25px;
+  width: 320px;
+  border-radius: 10px;
+  border: 1px solid #050404;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+#registrationForm label {
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: bold;
+}
+#registrationForm input[type="email"],
+#registrationForm input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.checkboxes {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+.checkboxes label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+}
+#registrationForm button[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+/*------------------------------------------------------------------
+  FOOTER
+-------------------------------------------------------------------*/
+.footer {
+  background: #f8f8f8;
+  padding: 30px 50px;
+  border-top: 1px solid #ccc;
+}
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 60px;
+}
+.footer-logo {
+  flex: 0 0 150px;
+  display: flex;
+  flex-direction: column;
+}
+.footer-logo img {
+  width: 150px;
+  margin-bottom: 10px;
+}
+.social-icons {
+  width: 50px;
+}
+.footer-columns {
+  display: flex;
+  flex: 1;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+.footer-column {
+  min-width: 180px;
+}
+.footer-column h4 {
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #333;
+}
+.footer-column ul {
+  list-style: none;
+}
+.footer-column li {
+  margin-bottom: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+}
+.footer-column li:hover {
+  text-decoration: underline;
+}
