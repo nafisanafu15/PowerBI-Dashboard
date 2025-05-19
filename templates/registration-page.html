@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registration Page</title>
+  <!-- pull from our /Css route -->
+  <link rel="stylesheet" href="/Css/registration.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <!-- pull logo from our /Assets route -->
+      <img src="/Assets/logo.png" alt="Logo">
+    </div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/landing">Dashboard</a>
+        <a href="#">Reports</a>
+        <a href="#">Resources</a>
+        <a href="#">Help</a>
+      </div>
+      <div class="nav-buttons">
+        <button onclick="location.href='/register'">Sign In</button>
+        <button onclick="location.href='/register'">Register</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main-content-wrapper">
+    <div class="main-content">
+      <!-- Title Box -->
+      <div class="title-box">
+        <h3>Register now to start Exploring!</h3>
+      </div>
+
+      <!-- Registration Form -->
+      <div class="container">
+        <form id="registrationForm">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="abc@analyticsinstitute.edu.au"
+            required
+          />
+
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="12 characters or longer"
+            required
+          />
+
+          <div class="checkboxes">
+            <label>
+              <input type="checkbox" id="stakeholder" />
+              Register as<br /><strong>Stakeholder</strong>
+            </label>
+            <label>
+              <input type="checkbox" id="manager" />
+              Register as<br /><strong>Manager</strong>
+            </label>
+          </div>
+
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <!-- Logo + social pulled from /Assets -->
+      <div class="footer-logo">
+        <img src="/Assets/logo.png" alt="Logo">
+        <img src="/Assets/Social.png" alt="Social Icons" class="social-icons">
+      </div>
+
+      <!-- Footer Columns -->
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h4>User cases</h4>
+          <ul>
+            <li>UI design</li>
+            <li>UX design</li>
+            <li>Wireframing</li>
+            <li>Diagramming</li>
+            <li>Brainstorming</li>
+            <li>Online Whiteboard</li>
+            <li>Team collaboration</li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Explore</h4>
+          <ul>
+            <li>Design</li>
+            <li>Prototyping</li>
+            <li>Development features</li>
+            <li>Design systems</li>
+            <li>Collaboration features</li>
+            <li>Design process</li>
+            <li>FigJam</li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Resources</h4>
+          <ul>
+            <li>Blog</li>
+            <li>Best Practices</li>
+            <li>Colors</li>
+            <li>Color Wheel</li>
+            <li>Support</li>
+            <li>Developers</li>
+            <li>Resources</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- pull JS from our /Js route -->
+  <script src="/Js/registration.js"></script>
+</body>
+</html>
