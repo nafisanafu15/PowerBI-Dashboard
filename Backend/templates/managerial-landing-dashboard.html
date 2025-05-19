@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Managerial Dashboard – KPI Overview</title>
 
-  <!-- main stylesheet -->
+  <!-- Main stylesheet -->
   <link
     rel="stylesheet"
     href="{{ url_for('static', filename='Css/style.css') }}"
@@ -42,7 +42,7 @@
           <a href="#">Download</a>
           <a href="#">Help</a>
         </div>
-        <div class="user-profile">
+        <div class="user-profile dropdown">
           <button class="dropdown-toggle">Sachin Mallar ▾</button>
           <ul class="profile-dropdown">
             <li><a href="#" id="logout-link">Logout</a></li>
@@ -106,9 +106,10 @@
     </main>
   </div>
 
-  <!-- CHART.JS -->
+  <!-- Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- YOUR DASHBOARD JS -->
+
+  <!-- Your dashboard JS -->
   <script
     src="{{ url_for('static', filename='Js/managerial-landing-dashboard.js') }}"
     defer
