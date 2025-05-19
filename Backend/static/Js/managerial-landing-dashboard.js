@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
     })
     .then(function(data) {
 
-      // === a) Prepare shared labels (StartDate) ===
+      // Prepare shared labels (StartDate) 
       var dates = data
         .map(function(r) { return r.StartDate; })            // extract dates
         .filter(function(d) { return d; })                   // drop nulls
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }).length;
       });
 
-      // 3) Line chart: Current Student vs Enrolled
+      // Line chart: Current Student vs Enrolled
       new Chart(
         document.getElementById("chart-current-enrolled"),
         {
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       );
 
-      // 4) Bar chart: Enrolled vs Offers total
+      //  Bar chart: Enrolled vs Offers total
       var totalStudents = data.filter(function(r){ return r.Stage==="Student"; }).length;
       var totalOffers   = data.filter(function(r){ return r.Stage==="Offer";   }).length;
       new Chart(
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       );
 
-      // 5) Pie chart: Visa Breakdown
+      //  Pie chart: Visa Breakdown
       var visaCounts = {};
       data.forEach(function(r) {
         var v = r["Visa Status"] || "Unknown"; 
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       );
 
-      // 6) Line chart: Offer Expiry Surge
+      //  Line chart: Offer Expiry Surge
       var expiryDates = data
         .map(function(r){ return r["Offer Expiry Date"]; })
         .filter(function(d){ return d; })
@@ -105,10 +105,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       );
 
-      // === 7) Storyboard highlights ===
+      //  Storyboard highlights 
       var total = data.length; 
 
-      // 7a) Due Payments: % opting >50% upfront fee
+      //  Due Payments: % opting >50% upfront fee
       var payYes = data.filter(function(r){
         return r["Do you want to pay more than 50% upfront fee?"]==="Yes";
       }).length;
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById("story-due-payments").innerText =
         pctPay + "% opted >50% upfront fee";
 
-      // 7b) Course Performance: % deferral rate
+      //  Course Performance: % deferral rate
       var deferYes = data.filter(function(r){
         return r["Is the offer deferred?"]==="Yes";
       }).length;
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById("story-course-performance").innerText =
         "-" + pctDef + "% deferral rate";
 
-      // 7c) Top Study Reason
+      //  Top Study Reason
       var reasonCounts = {};
       data.forEach(function(r){
         var reason = r["Study Reason"] || "Unknown";
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function() {
       console.error("Data load error:", err); // log fetch errors
     });
 
-  // 8) User‐profile dropdown (unchanged)
+  //  User‐profile dropdown (unchanged)
   var toggle = document.querySelector(".dropdown-toggle");
   var menu   = document.querySelector(".profile-dropdown");
   if(toggle && menu) {
