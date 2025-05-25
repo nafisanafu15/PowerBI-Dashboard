@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Register — Analytics Institute</title>
+  <title>Register â€” Analytics Institute</title>
 
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
@@ -11,6 +11,21 @@
   <!-- Reuse login styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='Css/login.css') }}">
+  <style>
+    .radio-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
 
@@ -63,8 +78,16 @@
 
         <div class="form-group">
           <label>Role</label>
-          <label><input type="radio" name="Role" value="Stakeholder" required> Stakeholder</label><br>
-          <label><input type="radio" name="Role" value="Manager" required> Manager</label>
+          <div class="radio-row">
+            <label class="radio-inline">
+              <input type="radio" name="Role" value="Stakeholder" required>
+              <span>Stakeholder</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="Role" value="Manager" required>
+              <span>Manager</span>
+            </label>
+          </div>
         </div>
 
         <button type="submit" class="btn-primary">Register</button>
@@ -77,10 +100,10 @@
     <div class="footer-top">
       <div class="footer-brand">
         <div class="socialIcons">
-          <a href="https://twitter.com" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
-          <a href="https://www.linkedin.com" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-          <a href="https://youtube.com" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-          <a href="https://instagram.com" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://twitter.com"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="https://www.linkedin.com"><i class="fa-brands fa-linkedin"></i></a>
+          <a href="https://youtube.com"><i class="fa-brands fa-youtube"></i></a>
+          <a href="https://instagram.com"><i class="fa-brands fa-instagram"></i></a>
         </div>
         <div class="footer-logo">
           <img src="{{ url_for('static', filename='Assets/logo.png') }}" alt="Analytics Institute Logo">
@@ -128,7 +151,6 @@
     </div>
   </footer>
 
-  <!-- JS -->
   <script src="{{ url_for('static', filename='Js/registration.js') }}"></script>
 </body>
 </html>
