@@ -63,6 +63,10 @@ def register():
         role = request.form.get("Role")
         print("role received:", role)
 
+        if len(password) < 12:
+            flash("Password must be at least 12 characters long.", "error")
+            return redirect(url_for("register"))
+
         hashed_pw = generate_password_hash(password)
 
         try:
