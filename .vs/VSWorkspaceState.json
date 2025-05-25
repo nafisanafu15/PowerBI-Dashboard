@@ -3,8 +3,10 @@
     "",
     "\\Backend",
     "\\Backend\\static",
+    "\\Backend\\static\\Css",
+    "\\Backend\\static\\Js",
     "\\Backend\\templates"
   ],
-  "SelectedNode": "\\Backend",
+  "SelectedNode": "\\Backend\\templates\\managerial-landing-dashboard.html",
   "PreviewInSolutionExplorer": false
 }

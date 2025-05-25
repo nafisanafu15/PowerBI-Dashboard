@@ -1,19 +1,19 @@
-/* ===== RESET & BASE ===== */
+/* Reset and Base */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
+body, html {
   height: 100%;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
+  background-color: #f9f9f9;
 }
 
-/* ===== NAVBAR ===== */
+/* Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -26,6 +26,7 @@ html, body {
 .navbar-logo img {
   max-width: 160px;
   height: auto;
+  margin-right: 0.5rem;
 }
 
 .nav-right {
@@ -66,7 +67,7 @@ html, body {
   cursor: pointer;
 }
 
-/* ===== MAIN WRAPPER ===== */
+/* Main content wrapper */
 .main-content-wrapper {
   flex: 1;
   display: flex;
@@ -80,7 +81,7 @@ html, body {
   padding-bottom: 40px;
 }
 
-/* ===== MAIN CONTENT BLOCK ===== */
+/* Main content block */
 .main-content {
   display: flex;
   flex-direction: column;
@@ -88,7 +89,7 @@ html, body {
   margin-top: 20px;
 }
 
-/* ===== TITLE ===== */
+/* Title box */
 .title-box {
   text-align: center;
   background: white;
@@ -104,7 +105,7 @@ html, body {
   color: #444;
 }
 
-/* ===== FORM CONTAINER ===== */
+/* Form container */
 .container {
   background: white;
   padding: 25px;
@@ -114,7 +115,7 @@ html, body {
   width: 300px;
 }
 
-/* ===== FORM ELEMENTS ===== */
+/* Form Elements */
 form label {
   display: block;
   margin-top: 15px;
@@ -132,6 +133,19 @@ input[type="password"] {
   box-sizing: border-box;
 }
 
+/* Checkbox group */
+.checkboxes {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+
+.checkboxes label {
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Submit button */
 button[type="submit"] {
   width: 100%;
   padding: 10px;
@@ -142,66 +156,7 @@ button[type="submit"] {
   cursor: pointer;
 }
 
-/* ===== ROLE (SIDE BY SIDE RADIO BUTTONS) ===== */
-.radio-row {
-  display: flex;
-  gap: 2rem;
-  margin-top: 0.5rem;
-}
-
-.radio-inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-/* ===== TOGGLE PASSWORD BUTTON ===== */
-.password-wrapper {
-  position: relative;
-}
-
-.password-wrapper .toggle-password {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #5E4AE3;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-/* ===== FLASH MESSAGES ===== */
-.flashes {
-  list-style: none;
-  margin: 10px 0;
-  padding: 0;
-}
-
-.flash {
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.flash.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.flash.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-/* ===== FOOTER ===== */
+/* Footer */
 .footer {
   background-color: #f8f8f8;
   padding: 30px 50px;
@@ -265,3 +220,34 @@ button[type="submit"] {
 .footer-column li:hover {
   text-decoration: underline;
 }
+
+/* Flash messages */
+.flashes {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+
+.flash {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.flash.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+
+.flash.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  margin: 15px 0;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
