@@ -1,41 +1,37 @@
-document.getElementById("registrationForm").addEventListener("submit", function(e) {
- 
+document.addEventListener('DOMContentLoaded', () => {
+  const pwdInput = document.getElementById('password');
+  const toggleBtn = document.querySelector('.toggle-password');
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const stakeholder = document.getElementById("stakeholder").checked;
-  const manager = document.getElementById("manager").checked;
-
-  // Basic validation for email and password
-  if (!email || !password) {
-    alert("Please fill in all fields.");
-    return;
+  if (pwdInput && toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        toggleBtn.textContent = 'Hide';
+      } else {
+        pwdInput.type = 'password';
+        toggleBtn.textContent = 'Show';
+      }
+    });
   }
 
-  // Regex for basic email validation
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  if (!emailRegex.test(email)) {
-    alert("Please enter a valid email address.");
-    return;
+  const form = document.getElementById('registrationForm');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      const email = document.getElementById('email').value.trim();
+      const password = pwdInput.value.trim();
+      const roleSelected = document.querySelector('input[name="Role"]:checked');
+
+      if (!email || !password || !roleSelected) {
+        alert("All fields are required.");
+        e.preventDefault();
+        return;
+      }
+
+      if (password.length < 12) {
+        alert("Password must be at least 12 characters.");
+        e.preventDefault();
+        return;
+      }
+    });
   }
-
-  // Password Strength validation (at least 12 characters)
-  if (password.length < 12) {
-    alert("Password must be at least 12 characters long.");
-    return;
-  }
-
-  if (!stakeholder && !manager) {
-    alert("Please select a role to register.");
-    return;
-  }
-
-  // Displaying the collected data
-  console.log("Email:", email);
-  console.log("Password:", password);
-  console.log("Roles:", { stakeholder, manager });
-
-  // On successful registration, reset the form and show a success message
-  alert("Registration successful!");
-  document.getElementById("registrationForm").reset();
 });
