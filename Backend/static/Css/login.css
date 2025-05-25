@@ -1,0 +1,249 @@
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ===== HEADER STYLES ===== */
+.site-header {
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+}
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.logo img {
+  max-width: 160px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+.site-nav {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.site-nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+}
+.site-nav a:hover {
+  color: #5E4AE3;
+}
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+.auth-buttons a {
+  padding: 6px 14px;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-weight: 500;
+  border: 1px solid #ccc;
+}
+.btn-signin {
+  background-color: #f2f2f2;
+  color: #333;
+}
+.btn-register {
+  background-color: #333;
+  color: white;
+  border: none;
+}
+
+/* ===== LOGIN MAIN ===== */
+.login-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #F6E7FF, #C4B7D3);
+  padding: 2rem 1rem;
+}
+.login-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+.login-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+/* ===== FORM ===== */
+.login-form .form-group {
+  margin-bottom: 1rem;
+}
+.login-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+.login-form input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+.password-wrapper {
+  position: relative;
+}
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #5E4AE3;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: #444;
+}
+.forgot-password {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #5E4AE3;
+  text-decoration: none;
+}
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.flash-container {
+  margin-bottom: 20px;
+  text-align: top;
+}
+
+.flash.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 12px;
+  margin: 10px auto;
+  width: 80%;
+  border-radius: 6px;
+  font-weight: bold;
+}
+/* =====================================
+   SITE FOOTER
+   ===================================== */
+.site-footer {
+  background: #fff;
+  border-top: 1px solid #ddd;
+  padding: 2rem 1rem 1rem;
+}
+.footer-top {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.footer-brand {
+  flex: 1 1 200px;
+}
+
+/* social icons */
+.socialIcons {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.socialIcons a {
+  margin-right: 1rem;
+  font-size: 1.25rem;
+  color: #333;
+  text-decoration: none;
+}
+.socialIcons a:last-child {
+  margin-right: 0;
+}
+.socialIcons a:hover i {
+  color: #5E4AE3;
+}
+
+/* footer logo */
+.footer-logo {
+  display: flex;
+  align-items: center;
+}
+.footer-logo img {
+  max-width: 160px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+/* footer link columns */
+.footer-links {
+  flex: 3 1 600px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.footer-column h4 {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+.footer-column ul {
+  list-style: none;
+}
+.footer-column li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* bottom copyright */
+.footer-bottom {
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+

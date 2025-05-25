@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Managerial Dashboard – KPI Overview</title>
+
+  <!-- Main stylesheet -->
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='Css/style.css') }}"
+  />
+</head>
+<body>
+  <div class="app-container">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="logo">
+        <img
+          src="{{ url_for('static', filename='Assets/logo.png') }}"
+          alt="Analytics Institute Logo"
+        />
+        <h2>Analytics Institute</h2>
+      </div>
+      <ul class="nav-links">
+        <li class="active"><a href="#">Dashboard</a></li>
+        <li><a href="#">Create Dashboard</a></li>
+        <li><a href="#">Download Data</a></li>
+        <li><a href="#">Settings</a></li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="menu-links">
+          <a href="#">File</a>
+          <a href="#">Data</a>
+          <a href="#">Export</a>
+          <a href="#">Analysis</a>
+          <a href="#">Download</a>
+          <a href="#">Help</a>
+        </div>
+        <div class="user-profile dropdown">
+          <button class="dropdown-toggle">
+            {{ session['email'].split('@')[0] | title }} ▾</button>
+
+          <ul class="profile-dropdown">
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+          </ul>
+        </div>
+      </header>
+
+      <!-- DASHBOARD HEADER -->
+      <section class="dashboard-header">
+        <h1>Managerial Dashboard</h1>
+      </section>
+
+      <!-- DASHBOARD BODY -->
+      <section class="dashboard-body">
+        <!-- CHARTS GRID -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Current Student vs Enrolled</h3>
+            <button class="view-report">View Report</button>
+            <canvas id="chart-current-enrolled"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Enrolled Vs Offer</h3>
+            <button class="view-report">View Report</button>
+            <canvas id="chart-enrolled-offer"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Visa Breakdown</h3>
+            <button class="view-report">View Report</button>
+            <canvas id="chart-visa-breakdown"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Offer Expiry Surge</h3>
+            <button class="view-report">View Report</button>
+            <canvas id="chart-offer-expiry-surge"></canvas>
+          </div>
+        </div>
+
+        <!-- KPI STORYBOARDS -->
+        <aside class="kpi-storyboards">
+          <h2 class="kpi-storyboards__title">Storyboards</h2>
+          <div class="kpi-card blue">
+            <h4>Due Payments</h4>
+            <p id="story-due-payments"></p>
+          </div>
+          <div class="kpi-card orange">
+            <h4>Course Performance</h4>
+            <p id="story-course-performance"></p>
+          </div>
+          <div class="kpi-card green">
+            <h4>Top Study Reasons</h4>
+            <p id="story-study-reasons"></p>
+          </div>
+        </aside>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <p>Copyright © 2025 Analytics Institute of Australia</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Your dashboard JS -->
+  <script
+    src="{{ url_for('static', filename='Js/managerial-landing-dashboard.js') }}"
+    defer
+  ></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In — Analytics Institute</title>
+
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous"
+  />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/login.css') }}">
+</head>
+<body>
+
+  <!-- =======================
+       HEADER NAVBAR
+  ======================== -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='Assets/logo.png') }}" alt="Analytics Institute Logo">
+      </div>
+      <nav class="site-nav">
+        <a href="{{ url_for('landing') }}">Home</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      
+        <a href="#">Reports</a>
+        <a href="#">Help</a>
+      </nav>
+      <div class="auth-buttons">
+        <a href="{{ url_for('login') }}" class="btn-signin">Login</a>
+        <a href="{{ url_for('register') }}" class="btn-register">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =======================
+       LOGIN FORM
+  ======================== -->
+  <main class="login-main">
+    <div class="login-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+      {% for category, msg in messages %}
+        <li class="flash {{ category }}">{{ msg }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+      <h2 class="login-title">Sign In</h2>
+      <form action="{{ url_for('login') }}" method="post" class="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="abc@analyticsinstitute.edu.au" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" placeholder="12 characters or longer" required>
+            <button type="button" class="toggle-password">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+        <a href="#" class="forgot-password">Forgot password?</a>
+      </form>
+    </div>
+  </main>
+  <!-- ============================
+       SITE FOOTER
+  ============================ -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <!-- social icons -->
+        <div class="socialIcons">
+          <a href="https://twitter.com" aria-label="X">
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+          <a href="https://www.linkedin.com" aria-label="LinkedIn">
+            <i class="fa-brands fa-linkedin"></i>
+          </a>
+          <a href="https://youtube.com" aria-label="YouTube">
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+          <a href="https://instagram.com" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+        </div>
+        <!-- footer logo -->
+        <div class="footer-logo">
+          <img src="{{ url_for('static', filename='Assets/logo.png') }}" alt="Analytics Institute Logo">
+        </div>
+      </div>
+
+      <!-- footer navigation columns -->
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4>Use cases</h4>
+          <ul>
+            <li>UI design</li>
+            <li>UX design</li>
+            <li>Wireframing</li>
+            <li>Diagramming</li>
+            <li>Brainstorming</li>
+            <li>Online whiteboard</li>
+            <li>Team collaboration</li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Explore</h4>
+          <ul>
+            <li>Design</li>
+            <li>Prototyping</li>
+            <li>Development features</li>
+            <li>Design systems</li>
+            <li>Collaboration features</li>
+            <li>Design process</li>
+            <li>FigJam</li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Resources</h4>
+          <ul>
+            <li>Blog</li>
+            <li>Best practices</li>
+            <li>Colors</li>
+            <li>Color wheel</li>
+            <li>Support</li>
+            <li>Developers</li>
+            <li>Resource library</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <!-- =======================
+       JS
+  ======================== -->
+  <script src="{{ url_for('static', filename='Js/login.js') }}"></script>
+</body>
+</html>

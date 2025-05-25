@@ -1,0 +1,253 @@
+/* Reset and Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar-logo img {
+  max-width: 160px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  gap: 12px;
+  margin-right: 20px;
+}
+
+.nav-links a {
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.nav-links a:hover {
+  color: #007BFF;
+}
+
+.nav-buttons {
+  display: flex;
+  background-color: #e0e0e0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  gap: 8px;
+}
+
+.nav-buttons .btn {
+  padding: 6px 12px;
+  border: none;
+  background: #000;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Main content wrapper */
+.main-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image: url('/static/Assets/background.png');
+  background-size: cover;
+  background-position: center -60px;
+  background-repeat: no-repeat;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* Main content block */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* Title box */
+.title-box {
+  text-align: center;
+  background: white;
+  padding: 8px 16px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #050404;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.title-box h3 {
+  font-size: 16px;
+  color: #444;
+}
+
+/* Form container */
+.container {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  border: 1px solid #050404;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 300px;
+}
+
+/* Form Elements */
+form label {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Checkbox group */
+.checkboxes {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+
+.checkboxes label {
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Submit button */
+button[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  background-color: #f8f8f8;
+  padding: 30px 50px;
+  border-top: 1px solid #ccc;
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.footer-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 150px;
+}
+
+.footer-logo img {
+  width: 150px;
+  margin-bottom: 10px;
+}
+
+.social-icons {
+  width: 50px;
+  height: auto;
+}
+
+.footer-columns {
+  display: flex;
+  flex: 1;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.footer-column {
+  min-width: 180px;
+}
+
+.footer-column h4 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #333;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-column li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+}
+
+.footer-column li:hover {
+  text-decoration: underline;
+}
+
+/* Flash messages */
+.flashes {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+
+.flash {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.flash.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+
+.flash.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  margin: 15px 0;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
