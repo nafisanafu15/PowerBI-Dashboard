@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agent Performance</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fdecee;
+    }
+    .top-panel {
+      height: 80px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px 0 280px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .left-panel {
+      width: 280px;
+      height: 100vh;
+      background-color: white;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    .right-panel {
+      width: 250px;
+      background-color: #e6d6df;
+      padding: 10px;
+      position: absolute;
+      top: 80px;
+      right: 0;
+      bottom: 0;
+    }
+    .content {
+      margin-left: 280px;
+      margin-right: 300px;
+      margin-top: 80px;
+      padding: 20px;
+    }
+    .header-photo {
+      width: 100%;
+    }
+    .profile-pic {
+      height: 60px;
+      border-radius: 30px;
+    }
+    .filter-box {
+      background-color: #fcd6e6;
+      margin: 20px;
+      border-radius: 12px;
+      text-align: center;
+      padding: 20px 10px;
+    }
+    .filter-dropdown {
+      width: 90%;
+      margin: 10px 0;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+      color: #2f2f2f;
+    }
+    .right-panel h3 {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .right-panel img {
+      width: 90%;
+      margin: 10px;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="left-panel">
+    <img src="logo.png" class="header-photo" alt="Logo">
+    <div class="filter-box">
+      <label for="time-period">Time Period</label>
+      <select id="time-period" class="filter-dropdown">
+        <option>Last 7 days</option>
+        <option>Last 30 days</option>
+        <option>This Year</option>
+      </select>
+      <label for="agent-name">Agent Name</label>
+      <select id="agent-name" class="filter-dropdown">
+        <option>A</option><option>B</option><option>C</option><option>D</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="top-panel">
+    <nav>
+      <a href="#">File</a> &nbsp;&nbsp;&nbsp;
+      <a href="#">Data</a> &nbsp;&nbsp;&nbsp;
+      <a href="#">Worksheet</a> &nbsp;&nbsp;&nbsp;
+      <a href="#">Analysis</a> &nbsp;&nbsp;&nbsp;
+      <a href="#">Download</a> &nbsp;&nbsp;&nbsp;
+      <a href="#">Help</a>
+    </nav>
+    <img src="sachinmallar.png" class="profile-pic" alt="Profile">
+  </div>
+
+  <div class="content">
+    <div class="card" style="width: 100%;">
+      <h2>Agent Performance</h2>
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <h3>Graphs And Charts</h3>
+    <img src="bar.png" alt="Bar Chart">
+    <img src="donut.png" alt="Donut Chart">
+    <img src="table.png" alt="Table">
+    <img src="pie.png" alt="Pie Chart">
+  </div>
+
+  <script>
+    const ctx = document.getElementById('barChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [...'abcdefghijklmnopqrstuvwxyz'],
+        datasets: [{
+          label: 'Count of Statement ID',
+          data: Array.from({length: 26}, () => Math.floor(Math.random() * 16) + 4),
+          backgroundColor: [...Array(26)].map(() => `hsl(${Math.random() * 360}, 60%, 60%)`)
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Agent Performance'
+          }
+        },
+        scales: {
+          x: { title: { display: true, text: 'Agent Name' } },
+          y: { title: { display: true, text: 'Count of Statement ID' }, beginAtZero: true }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
