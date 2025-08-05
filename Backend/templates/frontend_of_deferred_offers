@@ -1,0 +1,80 @@
+{% extends "global_layout.html" %}
+
+{% block title %}Deferred Offers Report{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% endblock %}
+
+{% block content %}
+<div class="report-main container-fluid">
+  <div class="row g-3">
+    <aside class="filters-panel col-lg-2">
+      <h3 class="mb-3">Filters</h3>
+      <div class="filter-group mb-3 time-filter">
+        <label class="form-label fw-bold">Time Period</label>
+        <div class="radio-group d-flex flex-column">
+          <label><input type="radio" name="time" value="today"> Today</label>
+          <label><input type="radio" name="time" value="week"> This week</label>
+          <label><input type="radio" name="time" value="month"> This month</label>
+          <label><input type="radio" name="time" value="year"> This year</label>
+          <label><input type="radio" name="time" value="custom"> Set up</label>
+        </div>
+        <div class="date-range">
+          <input type="text" class="time-range form-control form-control-sm" placeholder="Select range">
+          <div class="mt-2">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Sort by</label>
+        <div class="sort-buttons d-flex flex-wrap">
+          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Ascending</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Descending</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="offer">Offer ID</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="status">Offer Status</button>
+        </div>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Semester/Intake</label>
+        <div class="intake-buttons d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 1">Trimester 1</button>
+          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 2">Trimester 2</button>
+          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 3">Trimester 3</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="report-content col-lg-8">
+      <h1 class="mb-3 text-center">Deferred Offers Overview</h1>
+      <h2 class="h5 text-muted mb-4">Deferred Offers Overview by Application Count</h2>
+      <canvas id="mainChart" class="mb-4" height="200"></canvas>
+      <div class="table-responsive">
+        <table id="dataTable" class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr><th>Nationality</th><th>Number of Study Periods</th><th>Course Title</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="chart-options col-lg-2">
+      <h3 class="mb-3">Graphs and Charts</h3>
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-outline-primary chart-btn active" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i>Bar Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="doughnut"><i class="fa-solid fa-circle-notch me-1"></i>Donut Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="pie"><i class="fa-solid fa-chart-pie me-1"></i>Pie Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i>Table</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
+<script src="{{ url_for('static', filename='Js/deferred_offers_report.js') }}" defer></script>
+{% endblock %}
