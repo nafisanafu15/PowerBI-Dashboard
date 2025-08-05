@@ -1,0 +1,89 @@
+{% extends "global_layout.html" %}
+
+{% block title %}Enrolled vs Offer Report{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% endblock %}
+
+{% block content %}
+<div class="report-main container-fluid">
+  <div class="row g-3">
+    <aside class="filters-panel col-lg-2">
+      <h3 class="mb-3">Filters</h3>
+      <div class="mb-3 time-filter">
+        <label class="form-label fw-bold">Time Period</label>
+        <div class="radio-group d-flex flex-column">
+          <label><input type="radio" name="time" value="today"> Today</label>
+          <label><input type="radio" name="time" value="week"> This Week</label>
+          <label><input type="radio" name="time" value="month"> This Month</label>
+          <label><input type="radio" name="time" value="year"> This Year</label>
+          <label><input type="radio" name="time" value="custom"> Set up</label>
+        </div>
+        <div class="date-range">
+          <input type="text" class="time-range" placeholder="Select range" readonly>
+          <div class="mt-2">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold">Sort By</label>
+        <div class="sort-buttons">
+          <button class="sort-btn active" id="sortAsc">Ascending</button>
+          <button class="sort-btn" id="sortDesc">Descending</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold">Semester/Intake</label>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-primary btn-sm intake" data-sem="T1">Trimester 1</button>
+          <button type="button" class="btn btn-outline-primary btn-sm intake" data-sem="T2">Trimester 2</button>
+          <button type="button" class="btn btn-outline-primary btn-sm intake" data-sem="T3">Trimester 3</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold" for="managerFilter">Course Manager</label>
+        <input id="managerFilter" type="text" class="form-control form-control-sm" placeholder="Manager name">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold">Course ID</label>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-primary btn-sm course-toggle" data-course="Bachelor of Analytics">Bachelor of Analytics</button>
+          <button type="button" class="btn btn-outline-primary btn-sm course-toggle" data-course="Bachelor of Business Transformation">Bachelor of Business Transformation</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="report-content col-lg-8">
+      <h1 class="mb-3">Enrolled vs Offer</h1>
+      <h2 class="h5 text-muted mb-4">Students Compared to Offers Over Time</h2>
+      <canvas id="reportChart" class="mb-4"></canvas>
+      <div class="table-responsive">
+        <table id="reportTable" class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr><th>Start Date</th><th>Students</th><th>Offers</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="chart-options col-lg-2">
+      <h3 class="mb-3">Graphs and Charts</h3>
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-outline-primary chart-btn active" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i>Bar Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="pie"><i class="fa-solid fa-chart-pie me-1"></i>Pie Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="doughnut"><i class="fa-solid fa-circle-notch me-1"></i>Donut Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i>Table</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
+<script src="{{ url_for('static', filename='Js/enrolled_offer_report.js') }}" defer></script>
+{% endblock %}
