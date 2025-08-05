@@ -45,9 +45,75 @@ def dashboard():
     if 'email' not in session:
         return redirect(url_for('login'))  # redirect to login page
     return render_template("managerial-landing-dashboard.html")
-@app.route("/stakeholder")
-def stakeholder_dashboard():
-    return render_template("stakeholder-landing-dashboard.html")
+
+# New simplified dashboard replicating layout reference
+@app.route("/managerial-dashboard")
+def managerial_dashboard():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("managerial_dashboard.html")
+
+# Detailed report for "Current Students vs Enrolled vs Pending for Visa"
+@app.route("/report/current-students")
+def current_students_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("current_students_report.html")
+
+# Detailed report for "Enrolled vs Offer"
+@app.route("/report/enrolled-offer")
+def enrolled_offer_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("enrolled_offer_report.html")
+
+# Detailed report for "Visa Status Breakdown"
+@app.route("/report/visa-status")
+def visa_status_breakdown():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("visa_status_breakdown.html")
+
+# Detailed report for "Offer Expiry Surge"
+@app.route("/report/offer-expiry")
+def offer_expiry_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("offer_expiry_report.html")
+
+# Detailed report for "Application Status"
+@app.route("/report/application-status")
+def application_status_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("application_status_report.html")
+
+# Detailed report for "Deferred Offers"
+@app.route("/report/deferred-offers")
+def deferred_offers_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("deferred_offers_report.html")
+
+# Detailed report for "Agent Performance"
+@app.route("/report/agent-performance")
+def agent_performance_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("agent_performance_report.html")
+
+# Detailed report for "Student Classification"
+@app.route("/report/student-classification")
+def student_classification_report():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template("student_classification_report.html")
+@app.route("/leader-dashboard")
+def leader_dashboard():
+    if "email" not in session or session.get("role") != "Leader":
+        return redirect(url_for("login"))
+    return render_template("leader_dashboard.html")
+
 
 @app.route("/")
 def landing():
@@ -78,13 +144,13 @@ def register():
 
             session['email'] = email
             session['role'] = role
-            print("Redirecting to:", "dashboard" if role == "Manager" else "stakeholder_dashboard")
-
-
             if role == "Manager":
                 return redirect(url_for("dashboard"))
+            elif role == "Leader":
+                return redirect(url_for("leader_dashboard"))
             else:
-                return redirect(url_for("stakeholder_dashboard"))
+                return redirect(url_for("landing"))
+
 
         except sqlite3.IntegrityError:
             # Lookup existing role only once
@@ -126,16 +192,17 @@ def login():
         if result:
             stored_password, role = result
             if check_password_hash(stored_password, password):
-                session['email'] = email
-                session['role'] = role
-
+                session["email"] = email
+                session["role"] = role
                 if role == "Manager":
                     return redirect(url_for("dashboard"))
+                elif role == "Leader":
+                    return redirect(url_for("leader_dashboard"))
                 else:
-                    return redirect(url_for("stakeholder_dashboard"))
+                    return redirect(url_for("landing"))
             else:
                 flash("Incorrect password", "error")
-                return redirect(url_for("login"))  # stay on login, not register
+                return redirect(url_for("login"))
         else:
             flash("User not found", "error")
             return redirect(url_for("login"))

@@ -1,0 +1,99 @@
+/* Layout for new Managerial Dashboard */
+body {
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.container {
+    display:flex;
+    min-height:100vh;
+}
+.sidebar-left{
+    width:20%;
+    background:#fff;
+    padding:1rem;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+.main{
+    width:60%;
+    background:#F5E5E5;
+    padding:1rem;
+    overflow:auto;
+}
+.sidebar-right{
+    width:20%;
+    background:#C8B7E3;
+    padding:1rem;
+}
+.filter-group{
+    margin-bottom:1rem;
+}
+.filter-group h3{
+    font-size:1rem;
+    margin-bottom:0.5rem;
+}
+.radio-group label{
+    display:block;
+    margin-bottom:0.3rem;
+}
+.sort-buttons button,
+.intake-buttons button{
+    border:none;
+    border-radius:15px;
+    padding:0.3rem 0.6rem;
+    margin-right:0.3rem;
+    margin-bottom:0.3rem;
+    background:#7D60A7;
+    color:#fff;
+    cursor:pointer;
+}
+.intake-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.3rem;
+}
+.sort-buttons button.active,
+.intake-buttons button.active{
+    background:#5e3dee;
+    font-weight:bold;
+}
+.date-range{
+    display:none;
+    flex-direction:column;
+    gap:0.5rem;
+    margin-top:0.5rem;
+}
+.table-container{
+    background:#fff;
+    overflow:auto;
+}
+.table-container table{
+    width:100%;
+    border-collapse:collapse;
+}
+.table-container th,
+.table-container td{
+    padding:0.4rem;
+    border:1px solid #ddd;
+    font-size:0.9rem;
+}
+.widget-list button{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    margin-bottom:0.5rem;
+    border:none;
+    padding:0.5rem;
+    border-radius:8px;
+    background:#fff;
+    cursor:pointer;
+}
+.widget-list button:hover{
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+.widget-list button.active{
+    background:#5e3dee;
+    color:#fff;
+}

@@ -1,0 +1,105 @@
+/* layout for report page */
+.report-main {
+  padding: 1rem;
+}
+
+.filters-panel, .chart-options {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.filters-panel h3, .chart-options h3 {
+  margin-bottom: 0.5rem;
+  color: #5e4ae3;
+}
+
+.filter-group {
+  margin-bottom: 1rem;
+}
+
+.filter-group button {
+  margin-top: 0.3rem;
+  margin-right: 0.3rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.filters-panel .btn.active,
+.chart-options .chart-btn.active {
+  background-color: #5e4ae3;
+  color: #fff;
+}
+
+.report-content h1 {
+  font-size: 1.3rem;
+  color: #c72c41;
+}
+
+#reportTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#reportTable th, #reportTable td {
+  border: 1px solid #ccc;
+  padding: 0.4rem;
+  text-align: left;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.sort-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sort-btn.active {
+  background-color: #5e3dee;
+  color: white;
+  border: none;
+}
+
+.date-picker-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#dateRange {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.date-output {
+  font-size: 14px;
+  color: #333;
+}
+
+.report-content {
+  position: relative;
+  z-index: 2;
+}
+.radio-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.date-range {
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}

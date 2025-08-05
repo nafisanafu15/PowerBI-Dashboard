@@ -31,6 +31,10 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 1;
 }
 
 .logo {
@@ -106,6 +110,11 @@ body {
   cursor: pointer;
 }
 
+/* Hide default Bootstrap caret so only custom arrow is displayed */
+.dropdown-toggle::after {
+  display: none;
+}
+
 .profile-dropdown {
   display: none;
   position: absolute;
@@ -173,8 +182,9 @@ body {
 
 .chart-card h3 {
   margin-bottom: 0.5rem;
-  font-size: 1rem;
-  color: #333;
+  font-size: 1.1rem;
+  color: #5e4ae3;
+  font-weight: 600;
 }
 
 .chart-card button {

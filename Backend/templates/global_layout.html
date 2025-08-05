@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block head %}
+  <meta charset="UTF-8">
+  <title>{% block title %}Analytics Institute{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/report.css') }}">
+  {% block extra_head %}{% endblock %}
+{% endblock %}
+
+{% block body %}
+<div class="app-container">
+  <nav class="sidebar">
+    <div class="logo">
+      <img src="{{ url_for('static', filename='Assets/logo.png') }}" alt="Analytics Institute Logo">
+      <h2>Analytics Institute</h2>
+    </div>
+    <ul class="nav-links">
+      <li class="active"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      <li><a href="#">Download Data</a></li>
+      <li><a href="#">Settings</a></li>
+      <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
+    </ul>
+  </nav>
+  <main class="main-content">
+    <header class="topbar">
+      <div class="menu-links">
+        <a href="#">File</a>
+        <a href="#">Data</a>
+        <a href="#">Worksheet</a>
+        <a href="#">Analysis</a>
+        <a href="#">Download</a>
+        <a href="#">Help</a>
+      </div>
+      <div class="user-profile dropdown">
+        <button class="dropdown-toggle">
+          {% if session.get('email') %}
+            {{ session['email'].split('@')[0] | title }} ▾
+          {% else %}
+            User ▾
+          {% endif %}
+        </button>
+        <ul class="profile-dropdown">
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}{% endblock %}
+{% endblock %}

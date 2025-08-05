@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Managerial Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/managerial_dashboard.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar-left">
+    <div>
+      <h2>Analytics Institute of Australia</h2>
+      <div class="filter-group time-filter">
+        <h3>Filters</h3>
+        <div class="radio-group">
+          <label><input type="radio" name="time" value="today"> Today</label>
+          <label><input type="radio" name="time" value="week"> This week</label>
+          <label><input type="radio" name="time" value="month"> This month</label>
+          <label><input type="radio" name="time" value="year"> This year</label>
+          <label><input type="radio" name="time" value="custom"> Set up</label>
+        </div>
+        <div class="date-range">
+          <input type="text" class="time-range form-control form-control-sm" placeholder="Select range">
+          <div class="mt-2">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-group">
+        <h3>Sort by</h3>
+        <div class="sort-buttons">
+          <button data-sort="asc">Ascending</button>
+          <button data-sort="desc">Descending</button>
+          <button data-sort="offer">Offer ID</button>
+          <button data-sort="status">Offer Status</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <h3>Semester/Intake</h3>
+        <div class="intake-buttons">
+          <button data-sem="Trimester 1">Trimester 1</button>
+          <button data-sem="Trimester 2">Trimester 2</button>
+          <button data-sem="Trimester 3">Trimester 3</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <button>Download Data</button>
+      <button>Settings</button>
+      <a href="{{ url_for('logout') }}">Sign Out</a>
+    </div>
+  </aside>
+  <main class="main">
+    <h1>Managerial Dashboard</h1>
+    <h2>Visa Status Breakdown</h2>
+    <canvas id="visaChart" height="200"></canvas>
+    <div class="table-container">
+      <table id="dataTable">
+        <thead>
+          <tr><th>Nationality</th><th>Sum of Number of Study Periods</th><th>Course/Program</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+  <aside class="sidebar-right">
+    <h2 style="font-family:serif">Graphs And Charts</h2>
+    <div class="widget-list">
+      <button id="donutChartBtn"><span>🍩</span>Donut Chart</button>
+      <button id="barChartBtn"><span>▮▮</span>Bar Chart</button>
+      <button id="tableChartBtn"><span>▦</span>Table</button>
+      <button id="pieChartBtn"><span>🥧</span>Pie Chart</button>
+    </div>
+  </aside>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
+<script src="{{ url_for('static', filename='Js/managerial_dashboard.js') }}"></script>
+</body>
+</html>
