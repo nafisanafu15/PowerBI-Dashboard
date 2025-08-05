@@ -1,6 +1,13 @@
 ﻿// Js/managerial-landing-dashboard.js
 
 // 1) Wait until DOM is ready
+function parseDate(d){
+  if(!d) return null;
+  const p=d.split('/');
+  if(p.length!==3) return null;
+  return new Date(p[2],p[1]-1,p[0]);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
   // 2) Fetch the JSON from Flask
@@ -15,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .map(function(r) { return r.StartDate; })            // extract dates
         .filter(function(d) { return d; })                   // drop nulls
         .filter(function(v,i,a) { return a.indexOf(v)===i; })// unique
-        .sort(function(a,b){ return new Date(a)-new Date(b); }); // sort
+        .sort(function(a,b){ return parseDate(a)-parseDate(b); }); // sort
 
       // === b) Count students vs offers per date ===
       var studentCounts = dates.map(function(date) {
@@ -73,10 +80,32 @@ document.addEventListener("DOMContentLoaded", function() {
         {
           type: "pie",
           data: {
-            labels:   Object.keys(visaCounts),
-            datasets: [{ data: Object.values(visaCounts) }]
+            labels: Object.keys(visaCounts),
+            datasets: [{
+              data: Object.values(visaCounts),
+              backgroundColor: [
+                "#ff6384",
+                "#36a2eb",
+                "#ffce56",
+                "#8a2be2",
+                "#4bc0c0"
+              ],
+              borderColor: "#ffffff",
+              borderWidth: 2,
+              hoverOffset: 8
+            }]
           },
-          options: { responsive: true }
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Visa Breakdown",
+                color: "#c72c41",
+                font: { size: 18, weight: "bold" }
+              }
+            }
+          }
         }
       );
 
@@ -85,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .map(function(r){ return r["Offer Expiry Date"]; })
         .filter(function(d){ return d; })
         .filter(function(v,i,a){ return a.indexOf(v)===i; })
-        .sort(function(a,b){ return new Date(a)-new Date(b); });
+        .sort(function(a,b){ return parseDate(a)-parseDate(b); });
       var expiryCounts = expiryDates.map(function(d) {
         return data.filter(function(r){ return r["Offer Expiry Date"]===d; }).length;
       });

@@ -63,22 +63,22 @@
         <div class="charts-grid">
           <div class="chart-card">
             <h3>Current Student vs Enrolled</h3>
-            <button class="view-report">View Report</button>
+            <button class="view-report" onclick="location.href='{{ url_for('current_students_report') }}'">View Report</button>
             <canvas id="chart-current-enrolled"></canvas>
           </div>
           <div class="chart-card">
             <h3>Enrolled Vs Offer</h3>
-            <button class="view-report">View Report</button>
+            <button class="view-report" onclick="location.href='{{ url_for('enrolled_offer_report') }}'">View Report</button>
             <canvas id="chart-enrolled-offer"></canvas>
           </div>
           <div class="chart-card">
             <h3>Visa Breakdown</h3>
-            <button class="view-report">View Report</button>
+            <button class="view-report" onclick="location.href='{{ url_for('visa_status_breakdown') }}'">View Report</button>
             <canvas id="chart-visa-breakdown"></canvas>
           </div>
           <div class="chart-card">
             <h3>Offer Expiry Surge</h3>
-            <button class="view-report">View Report</button>
+            <button class="view-report" onclick="location.href='{{ url_for('offer_expiry_report') }}'">View Report</button>
             <canvas id="chart-offer-expiry-surge"></canvas>
           </div>
         </div>
