@@ -1,0 +1,204 @@
+:root {
+  --eggshell: #f4f1de;
+  --onyx: #454545;
+  --red-cmyk: #e1122e;
+  --silver-lake-blue: #6290c3;
+  --penn-blue: #06114a;
+
+  --eggshell-rgb: 244, 241, 222;
+  --onyx-rgb: 69, 69, 69;
+  --red-cmyk-rgb: 225, 18, 46;
+  --silver-lake-blue-rgb: 98, 144, 195;
+  --penn-blue-rgb: 6, 17, 74;
+
+  --color-bg: var(--eggshell);
+  --color-surface: var(--eggshell);
+  --color-text: var(--onyx);
+  --color-primary: var(--silver-lake-blue);
+  --color-accent: var(--penn-blue);
+  --color-danger: var(--red-cmyk);
+  --color-border: var(--silver-lake-blue);
+
+  --gradient-brand: linear-gradient(135deg, #ffffff, #000000);
+  --gradient-hot: linear-gradient(135deg, #ffffff, #000000);
+}
+
+body {
+  /* Use page-specific backgrounds without being overridden by the theme */
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(var(--penn-blue-rgb),0.1);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-secondary {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-bg);
+}
+
+.btn-danger:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--color-danger);
+  color: var(--color-bg);
+}
+
+.card,
+.chip,
+input,
+select,
+textarea {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(var(--penn-blue-rgb),0.1);
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 16px;
+}
+
+.bg-white {
+  background-color: var(--color-surface) !important;
+}
+
+.bg-light {
+  background-color: var(--color-bg) !important;
+}
+
+.text-dark {
+  color: var(--color-text) !important;
+}
+
+.text-danger {
+  color: var(--color-danger) !important;
+}
+
+/*
+ * Header styling
+ * Ensure navbar matches landing page design across all pages
+ */
+.navbar { 
+  padding: 1rem 0; 
+}
+
+.navbar-brand img {
+  height: 40px;
+}
+
+.navbar-nav {
+  gap: 2rem;
+}
+
+.navbar a,
+.navbar .nav-link {
+  color: #000;
+  text-transform: uppercase;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.navbar .btn {
+  color: #000;
+}
+
+.navbar .nav-link.active,
+.navbar .nav-link:hover,
+.navbar a:hover {
+  color: var(--color-primary);
+}
+
+.navbar .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+.navbar .nav-link:hover::after {
+  width: 100%;
+}
+
+/*
+ * Footer adjustments
+ * Reduce vertical padding for a shorter footer
+ */
+.footer-top {
+  padding: 0.5rem 0;
+}
+

@@ -1,3 +1,4 @@
+// Interactive scripts for website landing page
 document.querySelector('.mobile-nav-toggle').addEventListener('click', function () {
   document.body.classList.toggle('mobile-nav-active');
 });
@@ -5,9 +6,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
 (function() {
   "use strict";
 
-  /**
-   * Apply .scrolled class to the body as the page is scrolled down
-   */
+  
   function toggleScrolled() {
     const selectBody = document.querySelector('body');
     const selectHeader = document.querySelector('#header');
@@ -18,9 +17,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
   document.addEventListener('scroll', toggleScrolled);
   window.addEventListener('load', toggleScrolled);
 
-  /**
-   * Mobile nav toggle
-   */
+  
   const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
 
   function mobileNavToogle() {
@@ -30,9 +27,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
   }
   mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
 
-  /**
-   * Hide mobile nav on same-page/hash links
-   */
+  
   document.querySelectorAll('#navmenu a').forEach(navmenu => {
     navmenu.addEventListener('click', () => {
       if (document.querySelector('.mobile-nav-active')) {
@@ -42,9 +37,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
 
   });
 
-  /**
-   * Toggle mobile nav dropdowns
-   */
+  
   document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
     navmenu.addEventListener('click', function(e) {
       e.preventDefault();
@@ -54,9 +47,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
     });
   });
 
-  /**
-   * Preloader
-   */
+  
   const preloader = document.querySelector('#preloader');
   if (preloader) {
     window.addEventListener('load', () => {
@@ -64,9 +55,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
     });
   }
 
-  /**
-   * Scroll top button
-   */
+  
   let scrollTop = document.querySelector('.scroll-top');
 
   function toggleScrollTop() {
@@ -85,9 +74,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
   window.addEventListener('load', toggleScrollTop);
   document.addEventListener('scroll', toggleScrollTop);
 
-  /**
-   * Animation on scroll function and init
-   */
+  
   function aosInit() {
     AOS.init({
       duration: 600,
@@ -98,16 +85,12 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
   }
   window.addEventListener('load', aosInit);
 
-  /**
-   * Initiate glightbox
-   */
+  
   const glightbox = GLightbox({
     selector: '.glightbox'
   });
 
-  /**
-   * Init swiper sliders
-   */
+  
   function initSwiper() {
     document.querySelectorAll(".init-swiper").forEach(function(swiperElement) {
       let config = JSON.parse(
@@ -124,18 +107,14 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
 
   window.addEventListener("load", initSwiper);
 
-  /**
-   * Frequently Asked Questions Toggle
-   */
+  
   document.querySelectorAll('.faq-item h3, .faq-item .faq-toggle').forEach((faqItem) => {
     faqItem.addEventListener('click', () => {
       faqItem.parentNode.classList.toggle('faq-active');
     });
   });
 
-  /**
-   * Init isotope layout and filters
-   */
+  
   document.querySelectorAll('.isotope-layout').forEach(function(isotopeItem) {
     let layout = isotopeItem.getAttribute('data-layout') ?? 'masonry';
     let filter = isotopeItem.getAttribute('data-default-filter') ?? '*';
@@ -166,9 +145,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
 
   });
 
-  /**
-   * Correct scrolling position upon page load for URLs containing hash links.
-   */
+  
   window.addEventListener('load', function(e) {
     if (window.location.hash) {
       if (document.querySelector(window.location.hash)) {
@@ -184,9 +161,7 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
     }
   });
 
-  /**
-   * Navmenu Scrollspy
-   */
+  
   let navmenulinks = document.querySelectorAll('.navmenu a');
 
   function navmenuScrollspy() {
@@ -204,6 +179,16 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', function 
     })
   }
   window.addEventListener('load', navmenuScrollspy);
-  document.addEventListener('scroll', navmenuScrollspy);
+document.addEventListener('scroll', navmenuScrollspy);
 
-})();// JavaScript source code
+})();
+
+document.addEventListener('DOMContentLoaded', function () {
+  const profileButton = document.querySelector('.user-profile .dropdown-toggle');
+  if (profileButton) {
+    profileButton.addEventListener('click', function () {
+      const expanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', (!expanded).toString());
+    });
+  }
+});

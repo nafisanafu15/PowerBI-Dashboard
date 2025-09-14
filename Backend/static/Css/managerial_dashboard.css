@@ -1,4 +1,4 @@
-/* Layout for new Managerial Dashboard */
+
 body {
     margin:0;
     font-family: Arial, Helvetica, sans-serif;
@@ -9,7 +9,7 @@ body {
 }
 .sidebar-left{
     width:20%;
-    background:#fff;
+    background:var(--color-surface);
     padding:1rem;
     display:flex;
     flex-direction:column;
@@ -17,13 +17,13 @@ body {
 }
 .main{
     width:60%;
-    background:#F5E5E5;
+    background:#fff;
     padding:1rem;
     overflow:auto;
 }
 .sidebar-right{
     width:20%;
-    background:#C8B7E3;
+    background:color-mix(in srgb, var(--color-primary), var(--color-bg) 70%);
     padding:1rem;
 }
 .filter-group{
@@ -44,8 +44,8 @@ body {
     padding:0.3rem 0.6rem;
     margin-right:0.3rem;
     margin-bottom:0.3rem;
-    background:#7D60A7;
-    color:#fff;
+    background:var(--color-primary);
+    color:var(--color-bg);
     cursor:pointer;
 }
 .intake-buttons{
@@ -55,7 +55,7 @@ body {
 }
 .sort-buttons button.active,
 .intake-buttons button.active{
-    background:#5e3dee;
+    background:var(--color-accent);
     font-weight:bold;
 }
 .date-range{
@@ -75,7 +75,7 @@ body {
 .table-container th,
 .table-container td{
     padding:0.4rem;
-    border:1px solid #ddd;
+    border:1px solid var(--color-border);
     font-size:0.9rem;
 }
 .widget-list button{
@@ -87,13 +87,38 @@ body {
     border:none;
     padding:0.5rem;
     border-radius:8px;
-    background:#fff;
+    background:var(--color-surface);
     cursor:pointer;
 }
 .widget-list button:hover{
-    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    box-shadow:0 2px 6px rgba(var(--penn-blue-rgb),0.2);
 }
 .widget-list button.active{
-    background:#5e3dee;
-    color:#fff;
+    background:var(--color-accent);
+    color:var(--color-bg);
+}
+
+/* Sidebar action buttons */
+.sidebar-left > div:last-child {
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+}
+
+.sidebar-left > div:last-child button,
+.sidebar-left > div:last-child a {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border:none;
+    padding:0.5rem;
+    border-radius:8px;
+    background:var(--color-primary);
+    color:var(--color-bg);
+    text-decoration:none;
+    font-size:1.2rem;
+}
+
+.sidebar-left > div:last-child a {
+    color:var(--color-bg);
 }

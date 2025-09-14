@@ -1,4 +1,5 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+// Toggle password visibility on the login page
+document.addEventListener('DOMContentLoaded', () => {
   const pwdInput = document.getElementById('password');
   const toggleBtn = document.querySelector('.toggle-password');
 
@@ -14,3 +15,4 @@
     });
   }
 });
+

@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+{% extends "base.html" %}
+{# Manager dashboard layout #}
+
+{% block head %}
   <meta charset="UTF-8">
   <title>Managerial Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='Css/managerial_dashboard.css') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-</head>
-<body>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
 <div class="container">
   <aside class="sidebar-left">
     <div>
-      <h2>Analytics Institute of Australia</h2>
+      <h2>JTrack</h2>
       <div class="filter-group time-filter">
         <h3>Filters</h3>
         <div class="radio-group">
@@ -47,9 +51,10 @@
       </div>
     </div>
     <div>
-      <button>Download Data</button>
-      <button>Settings</button>
-      <a href="{{ url_for('logout') }}">Sign Out</a>
+      <a href="{{ url_for('custom_dashboard') }}" aria-label="Create Dashboard" title="Create Dashboard"><i class="fa-solid fa-pen-to-square"></i></a>
+      <button aria-label="Download Data" title="Download Data"><i class="fa-solid fa-download"></i></button>
+      <button aria-label="Settings" title="Settings"><i class="fa-solid fa-gear"></i></button>
+      <a href="{{ url_for('logout') }}" aria-label="Sign Out" title="Sign Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
     </div>
   </aside>
   <main class="main">
@@ -75,9 +80,10 @@
     </div>
   </aside>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
-<script src="{{ url_for('static', filename='Js/managerial_dashboard.js') }}"></script>
-</body>
-</html>
+<script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/managerial_dashboard.js') }}"></script>
+{% endblock %}
+

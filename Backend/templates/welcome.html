@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <title>Welcome — JTrack</title>
+{% endblock %}
+
+{% block body %}
+<main class="min-vh-100 d-flex flex-column justify-content-start align-items-center text-center pt-5 pb-5">
+  <h1 class="mb-2">Welcome to JTrack</h1>
+  <p class="mb-5 text-muted">JTrack helps you monitor applications, agent performance, and student trends in one place.</p>
+  {% if role == 'Manager' %}
+  <div class="row g-4 mb-5 w-100 px-3 px-md-5">
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <h5 class="mb-2">Current vs Enrolled</h5>
+        <p class="small text-muted">Compare current students with enrolled offers</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <h5 class="mb-2">Enrolled vs Offer</h5>
+        <p class="small text-muted">Track how offers convert to enrollments</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-passport"></i>
+        </div>
+        <h5 class="mb-2">Visa Breakdown</h5>
+        <p class="small text-muted">See visa categories among students</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h5 class="mb-2">Offer Expiry Surge</h5>
+        <p class="small text-muted">Identify upcoming expiring offers</p>
+      </div>
+    </div>
+  </div>
+  {% elif role == 'Leader' %}
+  <div class="row g-4 mb-5 w-100 px-3 px-md-5">
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-chart-column"></i>
+        </div>
+        <h5 class="mb-2">Application Status</h5>
+        <p class="small text-muted">Monitor submitted, in-review, accepted and rejected applications</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <h5 class="mb-2">Deferred Offers</h5>
+        <p class="small text-muted">Review trends in offer deferrals</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <h5 class="mb-2">Agent Performance</h5>
+        <p class="small text-muted">Identify top-performing agents and performance trends</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h5 class="mb-2">Student Classification</h5>
+        <p class="small text-muted">Explore enrollment breakdown by type</p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="row g-4 mb-5 w-100 px-3 px-md-5">
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-chart-column"></i>
+        </div>
+        <h5 class="mb-2">Track Applications</h5>
+        <p class="small text-muted">Track submitted, in-review, accepted, and rejected applications</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <h5 class="mb-2">Check Agent Performance</h5>
+        <p class="small text-muted">Identify top-performing agents and performance trends</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h5 class="mb-2">View Student Trends</h5>
+        <p class="small text-muted">View enrollment breakdown (full-time, part-time, online)</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="feature-card h-100">
+        <div class="feature-icon mb-3">
+          <i class="fa-solid fa-file-arrow-down"></i>
+        </div>
+        <h5 class="mb-2">Download Reports</h5>
+        <p class="small text-muted">Export insights and share with your team</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <a href="{{ url_for(dashboard_endpoint) }}" class="btn btn-primary">Go to Dashboard</a>
+</main>
+
+{% endblock %}

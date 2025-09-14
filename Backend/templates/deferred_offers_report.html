@@ -5,6 +5,11 @@
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- XLSX parser (for Excel upload fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -21,41 +26,26 @@
           <label><input type="radio" name="time" value="year"> This year</label>
           <label><input type="radio" name="time" value="custom"> Set up</label>
         </div>
-        <div class="date-range">
-          <input type="text" class="time-range form-control form-control-sm" placeholder="Select range">
-          <div class="mt-2">
-            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
-          </div>
-        </div>
-      </div>
-      <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Sort by</label>
-        <div class="sort-buttons d-flex flex-wrap">
-          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Ascending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Descending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="offer">Offer ID</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="status">Offer Status</button>
-        </div>
-      </div>
-      <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Semester/Intake</label>
-        <div class="intake-buttons d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 1">Trimester 1</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 2">Trimester 2</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 3">Trimester 3</button>
-        </div>
       </div>
     </aside>
 
     <section class="report-content col-lg-8">
-      <h1 class="mb-3 text-center">Deferred Offers Overview</h1>
-      <h2 class="h5 text-muted mb-4">Deferred Offers Overview by Application Count</h2>
-      <canvas id="mainChart" class="mb-4" height="200"></canvas>
+      <h1 class="mb-3 text-center">Deferred Offers Report</h1>
+      <h2 class="h5 text-muted mb-3">Deferred vs Total Offers</h2>
+
+      <!-- Excel upload appears automatically if APIs fail -->
+      <div id="excelFallback" class="alert alert-warning d-none">
+        Couldn’t reach the API. You can still generate the chart — choose your
+        <strong>dummy_data.xlsx</strong>:
+        <input type="file" id="excelInput" accept=".xlsx,.xls" class="form-control mt-2" />
+      </div>
+
+      <canvas id="deferredChart" height="220" class="mb-3"></canvas>
+
       <div class="table-responsive">
-        <table id="dataTable" class="table table-bordered table-sm">
+        <table id="deferredTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Nationality</th><th>Number of Study Periods</th><th>Course Title</th></tr>
+          <tr><th>Term</th><th>Deferred</th><th>Total Offers</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -65,16 +55,166 @@
     <aside class="chart-options col-lg-2">
       <h3 class="mb-3">Graphs and Charts</h3>
       <div class="d-flex flex-column gap-2">
-        <button class="btn btn-outline-primary chart-btn active" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i>Bar Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="doughnut"><i class="fa-solid fa-circle-notch me-1"></i>Donut Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="pie"><i class="fa-solid fa-chart-pie me-1"></i>Pie Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i>Table</button>
+        <button class="btn btn-outline-primary" data-type="bar">Bar Chart</button>
+        <button class="btn btn-outline-primary" data-type="donut">Donut Chart</button>
+        <button class="btn btn-outline-primary" data-type="pie">Pie Chart</button>
+        <button class="btn btn-outline-primary" data-type="table">Table</button>
       </div>
     </aside>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
-<script src="{{ url_for('static', filename='Js/deferred_offers_report.js') }}" defer></script>
+<script>
+(() => {
+  const endpoints = ['/api/deferred-offers', '/api/deferred-offers-overview'];
+  const chartEl   = document.getElementById('deferredChart');
+  const tableBody = document.querySelector('#deferredTable tbody');
+  const fb       = document.getElementById('excelFallback');
+  const fileIn   = document.getElementById('excelInput');
+  let CHART;
+
+  const colors = ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF'];
+
+  // ---- helpers ----
+  const toNum = v => {
+    const n = Number(String(v ?? '').replace(/,/g,''));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const sortTerms = rows => {
+    const ord = {t1:1,t2:2,t3:3,s1:1,s2:2,s3:3,trimester1:1,trimester2:2,trimester3:3};
+    const key = t => {
+      const s = String(t);
+      const m = s.match(/(t|s)\s*([123])\s*(\d{4})/i) || s.match(/trimester\s*([123])\s*(\d{4})/i);
+      if (m && m.length >= 3) {
+        let y, k;
+        if (/^(t|s)$/i.test(m[1])) { k=(m[1]+m[2]).toLowerCase(); y=Number(m[3]); }
+        else { k='trimester'+m[1]; y=Number(m[2]); }
+        return { y, o: ord[k] || 99 };
+      }
+      const m2 = s.match(/(\d{4})/);
+      return { y: m2 ? Number(m2[1]) : 0, o: 99 };
+    };
+    return rows.sort((a,b) => {
+      const A = key(a.term), B = key(b.term);
+      return A.y !== B.y ? A.y - B.y : A.o - B.o || a.term.localeCompare(b.term);
+    });
+  };
+
+  // Accepts aggregated OR raw and returns [{term, deferred, total}]
+  const normalize = data => {
+    if (!Array.isArray(data) || data.length === 0) return [];
+    const isAgg =
+      ('term' in data[0] || 'Term' in data[0]) &&
+      (('deferred' in data[0]) || ('deferred_count' in data[0]) || ('Deferred Count' in data[0]) || ('Deferred_Count' in data[0])) &&
+      (('total' in data[0]) || ('total_offers' in data[0]) || ('Total Offers' in data[0]) || ('Total_Offers' in data[0]));
+
+    if (isAgg) {
+      return data.map(r => ({
+        term: String(r.term ?? r.Term ?? '').trim(),
+        deferred: toNum(r.deferred ?? r.deferred_count ?? r['Deferred Count'] ?? r['Deferred_Count'] ?? 0),
+        total:    toNum(r.total ?? r.total_offers ?? r['Total Offers'] ?? r['Total_Offers'] ?? 0),
+      })).filter(x => x.term && !/^unknown$/i.test(x.term));
+    }
+
+    // RAW -> aggregate on client (your Excel headers)
+    const getTerm = r => {
+      const intake = r['Previous Offer Intake'] ?? r.previous_offer_intake ?? r['Offer Intake'] ?? r.offer_intake ?? r.Intake;
+      const year   = r['Previous Offer Year']   ?? r.previous_offer_year   ?? r['Offer Year']   ?? r.offer_year   ?? r.Year;
+      if (intake && year != null) return `${intake} ${year}`;
+      if (intake) return String(intake);
+      if (year != null) return String(year);
+      return 'Unknown';
+    };
+
+    const map = new Map();
+    for (const r of data) {
+      const t = getTerm(r);
+      const status = String(r.Status ?? r.status ?? r['Offer Status'] ?? r.offer_status ?? '').toLowerCase();
+      const cur = map.get(t) || { deferred: 0, total: 0 };
+      cur.total += 1;
+      if (status.startsWith('deferred')) cur.deferred += 1;
+      map.set(t, cur);
+    }
+    const out = [];
+    map.forEach((v,k) => { if (!/^unknown$/i.test(k)) out.push({ term:k, deferred:v.deferred, total:v.total }); });
+    return out;
+  };
+
+  const draw = (rows, type='bar') => {
+    rows = sortTerms(rows);
+    // table
+    tableBody.innerHTML = rows.map(r => `<tr><td>${r.term}</td><td>${r.deferred}</td><td>${r.total}</td></tr>`).join('');
+
+    // chart
+    const labels   = rows.map(r => r.term);
+    const deferred = rows.map(r => r.deferred);
+    const others   = rows.map(r => Math.max(r.total - r.deferred, 0));
+
+    if (CHART) CHART.destroy();
+
+    if (type === 'bar') {
+      CHART = new Chart(chartEl, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label:'Deferred', data: deferred, backgroundColor: '#FF6384', stack: 's' },
+            { label:'Other Offers', data: others, backgroundColor: '#36A2EB', stack: 's' }
+          ]
+        },
+        options: { responsive: true, plugins:{ legend:{ position:'bottom' } }, scales:{ x:{stacked:true}, y:{stacked:true, beginAtZero:true} } }
+      });
+    } else {
+      const pct = rows.map(r => r.total ? Math.round((r.deferred/r.total)*100) : 0);
+      CHART = new Chart(chartEl, {
+        type: type === 'donut' ? 'doughnut' : 'pie',
+        data: { labels, datasets: [{ data: pct, backgroundColor: labels.map((_,i)=>colors[i%colors.length]) }] },
+        options: { responsive:true, plugins:{ legend:{ position:'bottom' } } }
+      });
+    }
+  };
+
+  const tryApi = async () => {
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, { credentials:'same-origin' });
+        if (!res.ok) throw new Error(res.status);
+        const json = await res.json();
+        return normalize(json);
+      } catch(_) { /* keep trying */ }
+    }
+    return null;
+  };
+
+  const enableUpload = () => {
+    fb.classList.remove('d-none');
+    fileIn.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const ab = await file.arrayBuffer();
+      const wb = XLSX.read(ab, { type:'array' });
+      const sheetName = wb.SheetNames.includes('ReportData') ? 'ReportData' : wb.SheetNames[0];
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { defval: null });
+      const norm = normalize(rows);
+      draw(norm, 'bar');
+    });
+  };
+
+  // init
+  (async () => {
+    let rows = await tryApi();
+    if (!rows) { enableUpload(); return; }  // show Upload if APIs 404
+    draw(rows, 'bar');
+
+    document.querySelectorAll('.chart-options [data-type]').forEach(btn=>{
+      btn.addEventListener('click', () => {
+        const t = btn.getAttribute('data-type');
+        if (t === 'table') { document.getElementById('deferredTable').scrollIntoView({behavior:'smooth'}); return; }
+        draw(rows, t);
+      });
+    });
+  })();
+})();
+</script>
 {% endblock %}

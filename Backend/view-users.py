@@ -1,16 +1,17 @@
-import sqlite3
+import sqlite3  # Access SQLite database
 
-# Connect to the SQLite database
-conn = sqlite3.connect("users.db")
+# Connect to the existing users database
+conn = sqlite3.connect('users.db')
 c = conn.cursor()
 
-# Fetch all users
-c.execute("SELECT * FROM users")
+# Retrieve all rows from users table
+c.execute('SELECT * FROM users')
 users = c.fetchall()
 
-# Print users
-print("All registered users:")
+# Output each user
+print('All registered users:')
 for user in users:
     print(user)
 
+# Release database resources
 conn.close()

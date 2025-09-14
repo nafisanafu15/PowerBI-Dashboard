@@ -1,6 +1,6 @@
 {% extends "global_layout.html" %}
 
-{% block title %}Student Classification Overview{% endblock %}
+{% block title %}Student Classification Report{% endblock %}
 
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -49,13 +49,13 @@
     </aside>
 
     <section class="report-content col-lg-8">
-      <h1 class="mb-3 text-center">Student Classification Overview</h1>
-      <h2 class="h5 text-muted mb-4">Student Classification by Application Count</h2>
+      <h1 class="mb-3 text-center">Student Classification Report</h1>
+      <h2 class="h5 text-muted mb-4">Students by Classification</h2>
       <canvas id="mainChart" class="mb-4" height="200"></canvas>
       <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Nationality</th><th>Number of Study Periods</th><th>Course Title</th></tr>
+            <tr><th>Classification</th><th>Total</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -75,6 +75,24 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
-<script src="{{ url_for('static', filename='Js/student_classification_report.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
+<script>
+  window.reportConfig = {
+    endpoint: '/api/student-classification',
+    groupField: 'classification',
+    chartLabel: 'Students',
+    columns: [
+      {key: 'classification', label: 'Classification'},
+      {key: 'total', label: 'Total'}
+    ],
+    sortFns: {
+      asc: (a,b)=> (a.total??0) - (b.total??0),
+      desc: (a,b)=> (b.total??0) - (a.total??0),
+      offer: (a,b)=> String(a.offer||'').localeCompare(String(b.offer||'')),
+      status: (a,b)=> String(a.status||'').localeCompare(String(b.status||''))
+    }
+  };
+</script>
+<script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
 {% endblock %}
+

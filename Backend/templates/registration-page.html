@@ -1,138 +1,57 @@
 {% extends "base.html" %}
+{# User registration page template #}
 {% block head %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registration Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/glass.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='Css/registration.css') }}" />
 {% endblock %}
 
 {% block body %}
-<!-- Navigation Bar -->
-<nav class="navbar">
-  <div class="navbar-logo">
-    <img src="{{ url_for('static', filename='Assets/logo.png') }}" alt="Logo">
-  </div>
-  <div class="nav-right">
-    <div class="nav-links">
-      <a href="{{ url_for('landing') }}">Home</a>
-      <a href="{{ url_for('dashboard') }}">Dashboard</a>
-      <a href="#">Reports</a>
-
-      <a href="#">Help</a>
-    </div>
-    <div class="nav-buttons">
-      <!-- Uncomment if login route exists -->
-      {# <a href="{{ url_for('login') }}" class="btn">Sign In</a> #}
-      <a href="{{ url_for('login') }}" class="btn">Login</a>
-    </div>
-  </div>
-</nav>
-
-<main class="main-content-wrapper">
-  <div class="main-content">
-    <!-- Title Box -->
-    <div class="title-box">
+<main class="d-flex align-items-center justify-content-center min-vh-100">
+  <div class="card p-4 shadow-sm glass" style="max-width: 450px; width:100%;">
+    <div class="mb-3 text-center">
       <h3>Register now to start Exploring!</h3>
     </div>
-
-
-
-    <!-- Registration Form -->
-    <div class="container">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
         {% for category, msg in messages %}
-          <div class="flash {{ category }}">{{ msg }}</div>
+          <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         {% endfor %}
-      </div>
       {% endif %}
-      {% endwith %}
-      <form id="registrationForm" action="{{ url_for('register') }}" method="post">
-
-
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="Email"
-          placeholder="abc@analyticsinstitute.edu.au"
-          required />
-
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="Password"
-          placeholder="12 characters or longer"
-          required />
-
-        <div class="checkboxes">
-            <label>
-                <input type="radio" name="Role" id="leader" value="Leader" required />
-                Register as<br><strong>Leader</strong>
-            </label>
-            <label>
-                <input type="radio" name="Role" id="manager" value="Manager" required />
-                Register as<br><strong>Manager</strong>
-            </label>
+    {% endwith %}
+    <form id="registrationForm" action="{{ url_for('register') }}" method="post">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="Email" placeholder="abc@jtrack.edu.au" required />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="password" name="Password" placeholder="12 characters or longer" required />
+          <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
         </div>
-
-
-        <button type="submit">Register</button>
-      </form>
-    </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label d-block">Register as</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="Role" id="leader" value="Leader" required />
+          <label class="form-check-label" for="leader">Leader</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="Role" id="manager" value="Manager" required />
+          <label class="form-check-label" for="manager">Manager</label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
   </div>
 </main>
 
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-logo">
-      <img src="{{ url_for('static', filename='Assets/logo.png') }}" alt="Logo">
-      <img src="{{ url_for('static', filename='Assets/Social.png') }}" alt="Social Icons" class="social-icons">
-    </div>
-    <div class="footer-columns">
-      <div class="footer-column">
-        <h4>User cases</h4>
-        <ul>
-          <li>UI design</li>
-          <li>UX design</li>
-          <li>Wireframing</li>
-          <li>Diagramming</li>
-          <li>Brainstorming</li>
-          <li>Online Whiteboard</li>
-          <li>Team collaboration</li>
-        </ul>
-      </div>
-      <div class="footer-column">
-        <h4>Explore</h4>
-        <ul>
-          <li>Design</li>
-          <li>Prototyping</li>
-          <li>Development features</li>
-          <li>Design systems</li>
-          <li>Collaboration features</li>
-          <li>Design process</li>
-          <li>FigJam</li>
-        </ul>
-      </div>
-      <div class="footer-column">
-        <h4>Resources</h4>
-        <ul>
-          <li>Blog</li>
-          <li>Best Practices</li>
-          <li>Colors</li>
-          <li>Color Wheel</li>
-          <li>Support</li>
-          <li>Developers</li>
-          <li>Resources</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<!-- page-specific JS -->
-<script src="{{ url_for('static', filename='Js/registration.js') }}"></script>
+<script src="{{ url_for('static', filename='js/registration.js') }}"></script>
 {% endblock %}
