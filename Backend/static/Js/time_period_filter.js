@@ -1,3 +1,4 @@
+// Build a time period selector with preset options and custom range
 function initTimePeriodFilter(rootSelector, onChange){
   const root = typeof rootSelector === 'string' ? document.querySelector(rootSelector) : rootSelector;
   if(!root) return;
@@ -11,6 +12,7 @@ function initTimePeriodFilter(rootSelector, onChange){
   const fp = flatpickr(input, {mode:'range', onClose: sel => {from=sel[0]; to=sel[1];}});
 
   function preset(value){
+    // Set date range based on quick preset buttons
     const now = new Date();
     let start=null,end=null;
     if(value==='today'){start=end=now;}
@@ -42,4 +44,5 @@ function initTimePeriodFilter(rootSelector, onChange){
     if(typeof onChange==='function') onChange(from,to);
   });
 }
+// Expose initializer globally
 window.initTimePeriodFilter = initTimePeriodFilter;

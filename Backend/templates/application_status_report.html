@@ -49,13 +49,13 @@
     </aside>
 
     <section class="report-content col-lg-8">
-      <h1 class="mb-3 text-center">Application Status Overview</h1>
-      <h2 class="h5 text-muted mb-4">Application Status Breakdown</h2>
+      <h1 class="mb-3 text-center">Application Status Report</h1>
+      <h2 class="h5 text-muted mb-4">Applications by Status</h2>
       <canvas id="mainChart" class="mb-4" height="200"></canvas>
       <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Status</th><th>Number of Study Periods</th><th>Course Title</th></tr>
+            <tr><th>Status</th><th>Applications</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -75,6 +75,25 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
-<script src="{{ url_for('static', filename='Js/application_status_report.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
+<script>
+  window.reportConfig = {
+    endpoint: '/api/application-status',
+    groupField: 'status',
+    chartLabel: 'Applications',
+    intakeField: 'term',
+    columns: [
+      {key: 'status', label: 'Status'},
+      {key: 'total', label: 'Applications'}
+    ],
+    sortFns: {
+      asc: (a,b)=> (a.total??0) - (b.total??0),
+      desc: (a,b)=> (b.total??0) - (a.total??0),
+      offer: (a,b)=> String(a.offer||'').localeCompare(String(b.offer||'')),
+      status: (a,b)=> String(a.status||'').localeCompare(String(b.status||''))
+    }
+  };
+</script>
+<script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
 {% endblock %}
+

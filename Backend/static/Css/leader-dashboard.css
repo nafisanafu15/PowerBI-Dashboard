@@ -5,11 +5,25 @@
 }
 
 .chart-card {
+  position: relative;
   flex: 1 1 calc(50% - 1rem);
   background: #fff;
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(var(--penn-blue-rgb),0.1);
+}
+
+.chart-card .view-report {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #06114aff;
+  color: var(--color-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
 }
 
 .chart-card canvas {
@@ -17,7 +31,7 @@
   height: 300px !important;
 }
 
-/* KPI Storyboards */
+
 .kpi-storyboards {
   padding: 20px;
   margin-top: 20px;
@@ -26,28 +40,28 @@
 .section-title {
   font-weight: bold;
   margin-bottom: 15px;
-  color: #e74c3c; /* Red heading */
+  color: var(--color-danger);
 }
 
 .kpi-box {
   padding: 15px;
   margin-bottom: 15px;
-  color: white;
+  color: var(--color-bg);
   font-weight: bold;
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(var(--penn-blue-rgb),0.1);
 }
 
 .kpi-purple {
-  background-color: #6c5ce7;
+  background-color: var(--color-primary);
 }
 
 .kpi-orange {
-  background-color: #fd6e53;
+  background-color: var(--color-accent);
 }
 
 .kpi-blue {
-  background-color: #00bcd4;
+  background-color: var(--color-danger);
 }

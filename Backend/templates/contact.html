@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <meta charset="utf-8">
+  <title>Contact Us — JTrack</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/landing.css') }}">
+{% endblock %}
+
+{% block body %}
+<section class="hero hero-gradient py-5">
+  <div class="container">
+    <div class="glass glass-card p-4 p-lg-5 mx-auto" style="max-width: 920px;">
+      <div class="mb-3 text-center">
+        <h2 class="fw-bold mb-1">Contact <span class="text-emph">JTrack</span></h2>
+        <p class="text-secondary mb-0">Start a trial, ask a question, or talk to our team.</p>
+      </div>
+
+      <!-- Flash messages (success/error) -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-3">
+            {% for cat, msg in messages %}
+              <div class="alert alert-{{ 'success' if cat == 'success' else 'danger' }} mb-2" role="alert">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('contact') }}" novalidate>
+        <!-- honeypot to deter bots -->
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Your name *</label>
+            <input type="text" name="name" class="form-control glass-input" value="{{ request.form.name or '' }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Work email *</label>
+            <input type="email" name="email" class="form-control glass-input" value="{{ request.form.email or '' }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Company / Institution</label>
+            <input type="text" name="company" class="form-control glass-input" value="{{ request.form.company or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Topic</label>
+            <select name="subject" class="form-select glass-input">
+              <option value="General">General question</option>
+              <option value="Demo">Request a demo</option>
+              <option value="Pricing">Pricing / plans</option>
+              <option value="Support">Support</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Message *</label>
+            <textarea name="message" rows="5" class="form-control glass-input" required>{{ request.form.message or '' }}</textarea>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-4">
+          <button type="submit" class="btn btn-primary cta-btn">Send Message</button>
+          <a href="{{ url_for('register') }}" class="btn btn-outline-primary cta-btn">Start Free Trial</a>
+        </div>
+
+        <p class="small text-secondary mt-3 mb-0">
+          Prefer email? Reach us at <a href="mailto:hello@jtrack.example">hello@jtrack.example</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

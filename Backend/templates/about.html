@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block head %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - JTrack</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/landing.css') }}">
+{% endblock %}
+
+{% block body %}
+<section class="about-hero py-5 reveal">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-7 mb-4 mb-md-0">
+        <h2 class="mb-3">JTrack</h2>
+        <p>
+          JTrack is a centralized Power BI dashboard portal to bring all your critical data together in one place.
+          It simplifies complex information into clear, real-time dashboards and reports, helping teams make smarter decisions,
+          faster.
+        </p>
+        <h5 class="mt-4">Features</h5>
+        <ul class="list-unstyled">
+          <li><i class="fa-solid fa-check me-2" style="color: var(--color-primary);"></i>Real-Time Insights</li>
+          <li><i class="fa-solid fa-check me-2" style="color: var(--color-primary);"></i>Centralized Platform</li>
+          <li><i class="fa-solid fa-check me-2" style="color: var(--color-primary);"></i>User-Friendly Design</li>
+        </ul>
+        <button id="learn-more" class="btn btn-get-started mt-3">Learn More</button>
+      </div>
+      <div class="col-md-5">
+        <div class="about-media">
+          <div class="glass glass-card image-card">
+            <img src="{{ url_for('static', filename='Assets/Aboutuscardpic01.png') }}" class="img-fluid" alt="JTrack Features">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="details" class="py-5">
+  <div class="container">
+    <div class="mb-5 reveal">
+      <h3 class="mb-3">What You Can Do Here</h3>
+      <ul>
+        <li><strong>Access Dashboards</strong> – View performance metrics and KPIs instantly, all in one place.</li>
+        <li><strong>Generate Reports</strong> – Create detailed, interactive reports for deeper insights.</li>
+        <li><strong>Track Progress</strong> – Monitor business trends, performance, and opportunities in real time.</li>
+        <li><strong>Role-Based Views</strong> – Leaders and managers can access customized dashboards tailored to their needs.</li>
+        <li><strong>Interactive Filters</strong> – Explore data dynamically with easy-to-use filtering and drill-down features.</li>
+      </ul>
+    </div>
+    <div class="mb-5 reveal">
+      <h3 class="mb-3">Why Use JTrack?</h3>
+      <ul>
+        <li><strong>Real-Time Insights</strong> – No more waiting; get up-to-date information instantly.</li>
+        <li><strong>Centralized Platform</strong> – One secure hub for all your dashboards and reports.</li>
+        <li><strong>User-Friendly Design</strong> – Clean, intuitive interface for both technical and non-technical users.</li>
+        <li><strong>Data-Driven Strategy</strong> – Turn raw numbers into actionable strategies.</li>
+      </ul>
+    </div>
+    <div class="reveal">
+      <h3 class="mb-3">Our Goal</h3>
+      <p>
+        The goal of JTrack is to empower organizations with clarity, speed, and insight. Whether you’re a leader, manager, or analyst,
+        JTrack gives you the tools to see the bigger picture and act with confidence.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+document.getElementById('learn-more').addEventListener('click', function() {
+  document.getElementById('details').scrollIntoView({behavior: 'smooth'});
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('reveal-visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='Css/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Css/glass.css') }}">
+
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm navbar-glass">
+    <div class="container-fluid px-5">
+      <a class="navbar-brand"
+         href="{{ url_for('leader_dashboard') if session.get('role') == 'Leader' else url_for('dashboard') if session.get('role') else url_for('landing') }}">
+        <img src="{{ url_for('static', filename='Assets/logo.svg') }}" alt="JTrack Logo" />
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if request.endpoint == 'landing' else '' }}"
+               href="{{ url_for('landing') }}">Home</a>
+          </li>
+
+          {% if session.get('email') %}
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if request.endpoint == 'welcome' else '' }}"
+               href="{{ url_for('welcome') }}">Welcome Page</a>
+          </li>
+          {% endif %}
+
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if request.endpoint == 'about' else '' }}"
+               href="{{ url_for('about') }}">About Us</a>
+          </li>
+
+          <!-- NEW: Contact Us link -->
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if request.endpoint == 'contact' else '' }}"
+               href="{{ url_for('contact') }}">Contact Us</a>
+          </li>
+        </ul>
+
+        <div class="d-flex">
+          {% if session.get('email') %}
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              {{ session['email'].split('@')[0] | title }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+          </div>
+          {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">Sign in</a>
+          <a href="{{ url_for('register') }}" class="btn btn-primary">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

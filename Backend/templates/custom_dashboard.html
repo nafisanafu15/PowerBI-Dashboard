@@ -1,0 +1,22 @@
+{% extends "global_layout.html" %}
+
+{% block title %}Create Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-page">
+  <h1 class="mb-2">Create Dashboard</h1>
+
+  <div class="action-bar mb-3">
+    <button id="addChart" class="btn btn-primary">Add Chart</button>
+    <button id="saveDashboard" class="btn btn-success ms-2">Save</button>
+    <button id="resetDashboard" class="btn btn-outline-secondary ms-2">Reset</button>
+  </div>
+
+  <div id="charts" class="custom-charts-grid"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/custom_dashboard.js') }}"></script>
+<script type="module" src="/static/js/constraints.js"></script>
+{% endblock %}

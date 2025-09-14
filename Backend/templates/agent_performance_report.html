@@ -32,18 +32,10 @@
       <div class="filter-group mb-3">
         <label class="form-label fw-bold">Sort by</label>
         <div class="sort-buttons d-flex flex-wrap">
-          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Ascending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Descending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="offer">Offer ID</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="status">Offer Status</button>
-        </div>
-      </div>
-      <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Semester/Intake</label>
-        <div class="intake-buttons d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 1">Trimester 1</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 2">Trimester 2</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 3">Trimester 3</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Enrolled ↑</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Enrolled ↓</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="offers">Offers</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="applications">Applications</button>
         </div>
       </div>
     </aside>
@@ -55,7 +47,7 @@
       <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Nationality</th><th>Number of Study Periods</th><th>Course Title</th></tr>
+            <tr><th>Agent</th><th>Applications</th><th>Offers</th><th>Enrolled</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -75,6 +67,25 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='Js/time_period_filter.js') }}"></script>
-<script src="{{ url_for('static', filename='Js/agent_performance_report.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
+  <script>
+  window.reportConfig = {
+    endpoint: '/api/agent-performance',
+    groupField: 'agent',
+    chartLabel: 'Applications',
+    columns: [
+      {key: 'agent', label: 'Agent'},
+      {key: 'applications', label: 'Applications'},
+      {key: 'offers', label: 'Offers'},
+      {key: 'enrolled', label: 'Enrolled'}
+    ],
+    sortFns: {
+      asc: (a,b)=> (a.enrolled??0) - (b.enrolled??0),
+      desc: (a,b)=> (b.enrolled??0) - (a.enrolled??0),
+      offers: (a,b)=> (b.offers??0) - (a.offers??0),
+      applications: (a,b)=> (b.applications??0) - (a.applications??0)
+    }
+  };
+  </script>
+<script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
 {% endblock %}
