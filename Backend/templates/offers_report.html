@@ -1,0 +1,223 @@
+{% extends "global_layout.html" %}
+
+{% block title %}Offers Report{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="report-main container-fluid">
+  <div class="row g-3">
+    <aside class="filters-panel col-lg-2">
+      <h3 class="mb-3">Filters</h3>
+      <div class="filter-group mb-3 time-filter">
+        <label class="form-label fw-bold">Time Period</label>
+        <div class="radio-group d-flex flex-column">
+          <label><input type="radio" name="time" value="all" checked> All time</label>
+          <label><input type="radio" name="time" value="today"> Today</label>
+          <label><input type="radio" name="time" value="week"> This week</label>
+          <label><input type="radio" name="time" value="month"> This month</label>
+          <label><input type="radio" name="time" value="year"> This year</label>
+          <label><input type="radio" name="time" value="custom"> Set up</label>
+        </div>
+      </div>
+    </aside>
+
+    <section class="report-content col-lg-8">
+      <h1 class="mb-3 text-center">Offers Report</h1>
+      <h2 class="h5 text-muted mb-3">Student count by offer status</h2>
+
+      <div id="excelFallback" class="alert alert-warning d-none" role="alert">
+        Couldn’t reach the API. You can still generate the chart — choose your
+        <strong>dummy_data.xlsx</strong>:
+        <input type="file" id="excelInput" accept=".xlsx,.xls" class="form-control mt-2" />
+      </div>
+
+      <canvas id="offersChart" height="220" class="mb-3"></canvas>
+
+      <div class="table-responsive">
+        <table id="offersTable" class="table table-bordered table-sm">
+          <thead class="table-light">
+          <tr><th>Status</th><th>Student Count</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="chart-options col-lg-2">
+      <h3 class="mb-3">Graphs and Charts</h3>
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-outline-primary" data-type="bar">Bar Chart</button>
+        <button class="btn btn-outline-primary" data-type="donut">Donut Chart</button>
+        <button class="btn btn-outline-primary" data-type="pie">Pie Chart</button>
+        <button class="btn btn-outline-primary" data-type="table">Table</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const endpoints = ['/api/offers-status', '/api/application-status'];
+  const chartEl   = document.getElementById('offersChart');
+  const tableBody = document.querySelector('#offersTable tbody');
+  const fb        = document.getElementById('excelFallback');
+  const fileIn    = document.getElementById('excelInput');
+  let chart;
+
+  const colors = ['#2563eb', '#f97316', '#10b981', '#ef4444', '#8b5cf6', '#14b8a6', '#f59e0b', '#3b82f6', '#ec4899', '#22d3ee'];
+
+  const toNumber = (value) => {
+    const num = Number(String(value ?? '').replace(/,/g, ''));
+    return Number.isFinite(num) ? num : 0;
+  };
+
+  const sortRows = (rows) => rows
+    .filter(r => r.status && !/^unknown$/i.test(r.status))
+    .sort((a, b) => b.student_count - a.student_count || a.status.localeCompare(b.status));
+
+  const normalize = (data) => {
+    if (!Array.isArray(data) || !data.length) return [];
+    const first = data[0] ?? {};
+    const hasStatus = 'status' in first || 'Status' in first || 'offer_status' in first || 'Offer Status' in first;
+    const hasCount = 'student_count' in first || 'Student Count' in first || 'total' in first || 'Total' in first || 'count' in first || 'Count' in first;
+
+    if (hasStatus && hasCount && Object.keys(first).length <= 3) {
+      return sortRows(
+        data.map(row => ({
+          status: String(row.status ?? row.Status ?? row['offer_status'] ?? row['Offer Status'] ?? '').trim(),
+          student_count: toNumber(row.student_count ?? row['Student Count'] ?? row.total ?? row.Total ?? row.count ?? row.Count ?? 0),
+        }))
+      );
+    }
+
+    if (!hasStatus) return [];
+
+    const counts = new Map();
+    for (const row of data) {
+      const status = String(row.status ?? row.Status ?? row['offer_status'] ?? row['Offer Status'] ?? row['Application Status'] ?? row.application_status ?? '').trim();
+      if (!status) continue;
+      const key = status || 'Unknown';
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+
+    return sortRows(Array.from(counts, ([status, student_count]) => ({ status, student_count })));
+  };
+
+  const render = (rows, type = 'bar') => {
+    if (!Array.isArray(rows)) rows = [];
+    if (!rows.length) {
+      tableBody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">No offer data available</td></tr>';
+      if (chart) { chart.destroy(); chart = null; }
+      return;
+    }
+
+    const labels = rows.map(r => r.status);
+    const counts = rows.map(r => r.student_count);
+
+    tableBody.innerHTML = rows.map(r => `<tr><td>${r.status}</td><td>${r.student_count}</td></tr>`).join('');
+
+    if (chart) chart.destroy();
+
+    if (type === 'bar') {
+      chart = new Chart(chartEl, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Student Count',
+            data: counts,
+            backgroundColor: labels.map((_, idx) => colors[idx % colors.length]),
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+          },
+        },
+      });
+    } else {
+      chart = new Chart(chartEl, {
+        type: type === 'donut' ? 'doughnut' : 'pie',
+        data: {
+          labels,
+          datasets: [{ data: counts, backgroundColor: labels.map((_, idx) => colors[idx % colors.length]) }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } },
+        },
+      });
+    }
+  };
+
+  const tryApi = async () => {
+    for (const url of endpoints) {
+      try {
+        const response = await fetch(url, { credentials: 'same-origin' });
+        if (!response.ok) throw new Error(String(response.status));
+        const json = await response.json();
+        const normalized = normalize(json);
+        if (normalized.length) return normalized;
+      } catch (_) {
+        /* continue trying */
+      }
+    }
+    return [];
+  };
+
+  const enableUpload = () => {
+    fb.classList.remove('d-none');
+    fileIn.addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const sheetName = workbook.SheetNames.includes('ReportData') ? 'ReportData' : workbook.SheetNames[0];
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
+        const normalized = normalize(rows);
+        render(normalized);
+      } catch (error) {
+        console.error('Failed to parse Excel upload', error);
+      }
+    }, { once: true });
+  };
+
+  const init = async () => {
+    const rows = await tryApi();
+    if (rows.length) {
+      render(rows);
+    } else {
+      render([]);
+      enableUpload();
+    }
+  };
+
+  document.querySelectorAll('.chart-options button').forEach((button) => {
+    button.addEventListener('click', () => {
+      const type = button.dataset.type;
+      if (type === 'table') {
+        document.getElementById('offersTable').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      const rows = Array.from(tableBody.querySelectorAll('tr')).map(tr => ({
+        status: tr.children[0]?.textContent ?? '',
+        student_count: Number(tr.children[1]?.textContent ?? 0),
+      })).filter(r => r.status);
+      render(rows, type);
+    });
+  });
+
+  init();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "global_layout.html" %}
+
+{% block title %}Course by Manager Report{% endblock %}
+
+{% block extra_head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="report-main container-fluid">
+  <div class="row g-3">
+    <aside class="filters-panel col-lg-2">
+      <h3 class="mb-3">Filters</h3>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Trimester</label>
+        <div class="intake-buttons d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary btn-sm" data-sem="t1">T1</button>
+          <button class="btn btn-outline-primary btn-sm" data-sem="t2">T2</button>
+          <button class="btn btn-outline-primary btn-sm" data-sem="t3">T3</button>
+        </div>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold" for="manager-filter">Course manager</label>
+        <div id="manager-filter" class="custom-filter text-muted small">Loading managers…</div>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold" for="course-filter">Course</label>
+        <div id="course-filter" class="custom-filter text-muted small">Loading courses…</div>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Sort by</label>
+        <div class="sort-buttons d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Most students</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Fewest students</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="report-content col-lg-8">
+      <h1 class="mb-3 text-center">Course by Manager</h1>
+      <p class="text-muted text-center mb-4">Review student counts by course and manager, and filter by trimester or specific teams.</p>
+      <canvas id="mainChart" class="mb-4" height="220"></canvas>
+      <div class="table-responsive">
+        <table id="dataTable" class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>Course</th>
+              <th>Students</th>
+              <th>Manager</th>
+              <th>Trimester</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="chart-options col-lg-2">
+      <h3 class="mb-3">Graphs and Charts</h3>
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-outline-primary chart-btn" data-type="bar"><i class="fa-solid fa-chart-bar me-1"></i>Bar Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="doughnut"><i class="fa-solid fa-chart-pie me-1"></i>Doughnut</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i>Table</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  window.reportConfig = {
+    endpoint: '/api/course-by-manager',
+    groupField: 'course_name',
+    columns: [
+      { key: 'course_name', label: 'Course' },
+      { key: 'student_count', label: 'Students', isMetric: true },
+      { key: 'course_manager', label: 'Manager', chart: false, keepRaw: true },
+      { key: 'trimester', label: 'Trimester', chart: false, keepRaw: true }
+    ],
+    intakeField: 'trimester',
+    extraFields: ['course_manager', 'trimester'],
+    matrix: {
+      rowField: 'course_name',
+      columnField: 'course_manager',
+      valueField: 'student_count',
+      orientation: 'horizontal',
+      extraFields: ['trimester']
+    },
+    filters: [
+      { field: 'course_manager', selector: '#manager-filter' },
+      { field: 'course_name', selector: '#course-filter' }
+    ],
+    defaultChartType: 'bar',
+    chartOptions: {
+      scales: {
+        x: { ticks: { precision: 0 } }
+      }
+    }
+  };
+</script>
+<script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
+{% endblock %}

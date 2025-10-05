@@ -1,12 +1,8 @@
 {% extends "global_layout.html" %}
 
-{% block title %}Current vs Enrolled Report{% endblock %}
+{% block title %}Study Reason by Course Report{% endblock %}
 
 {% block extra_head %}
-  <!-- Flatpickr for custom date range -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
@@ -16,53 +12,35 @@
     <!-- Filters -->
     <aside class="filters-panel col-lg-2">
       <h3 class="mb-3">Filters</h3>
-      <div class="filter-group mb-3 time-filter">
-        <label class="form-label fw-bold">Time Period</label>
-        <div class="radio-group d-flex flex-column">
-          <label><input type="radio" name="time" value="today"> Today</label>
-          <label><input type="radio" name="time" value="week"> This week</label>
-          <label><input type="radio" name="time" value="month"> This month</label>
-          <label><input type="radio" name="time" value="year"> This year</label>
-          <label><input type="radio" name="time" value="custom"> Set up</label>
-        </div>
-        <div class="date-range mt-2" style="display:none;">
-          <input type="text" class="time-range form-control form-control-sm" placeholder="Select range">
-          <div class="mt-2 d-flex gap-2">
-            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
-          </div>
-        </div>
+
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Study Reason</label>
+        <div class="filter-options reason-filter small text-muted">Loading options…</div>
+      </div>
+
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Course</label>
+        <div class="filter-options course-filter small text-muted">Loading options…</div>
       </div>
 
       <div class="filter-group mb-3">
         <label class="form-label fw-bold">Sort by</label>
         <div class="sort-buttons d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Ascending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Descending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="offer">Offer ID</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="status">Offer Status</button>
-        </div>
-      </div>
-
-      <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Semester/Intake</label>
-        <div class="intake-buttons d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 1">Trimester 1</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 2">Trimester 2</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 3">Trimester 3</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Lowest student count</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Highest student count</button>
         </div>
       </div>
     </aside>
 
     <!-- Report Content -->
     <section class="report-content col-lg-8">
-      <h1 class="mb-3 text-center">Current vs Enrolled Report</h1>
-      <h2 class="h5 text-muted mb-4">Current Students vs Enrolled</h2>
-      <canvas id="mainChart" class="mb-4" height="200"></canvas>
+      <h1 class="mb-3 text-center">Study Reason by Course</h1>
+      <p class="text-muted text-center mb-4">Visualise how many students cite each study reason across courses and explore the combinations below.</p>
+      <canvas id="mainChart" class="mb-4" height="220"></canvas>
       <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Term</th><th>Current Students</th><th>Enrolled</th></tr>
+            <tr><th>Course</th><th>Study Reason</th><th>Students</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -82,23 +60,28 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
 <script>
   window.reportConfig = {
-    endpoint: '/api/current-vs-enrolled',
-    groupField: 'term',
-    chartLabel: 'Students',
-    intakeField: 'term',
+    endpoint: '/api/study-reason-by-course',
+    groupField: 'course_name',
     columns: [
-      { key: 'term', label: 'Term' },
-      { key: 'current_students', label: 'Current Students' },
-      { key: 'enrolled', label: 'Enrolled' }
+      { key: 'course_name', label: 'Course' },
+      { key: 'study_reason', label: 'Study Reason' },
+      { key: 'student_count', label: 'Students' }
+    ],
+    matrix: {
+      rowField: 'course_name',
+      columnField: 'study_reason',
+      valueField: 'student_count',
+      orientation: 'horizontal'
+    },
+    filters: [
+      { field: 'study_reason', selector: '.reason-filter' },
+      { field: 'course_name', selector: '.course-filter' }
     ],
     sortFns: {
-      asc: (a,b) => (a.enrolled ?? 0) - (b.enrolled ?? 0),
-      desc: (a,b) => (b.enrolled ?? 0) - (a.enrolled ?? 0),
-      offer: (a,b) => String(a.offer || '').localeCompare(String(b.offer || '')),
-      status: (a,b) => String(a.status || '').localeCompare(String(b.status || ''))
+      asc: (a, b) => (a.student_count ?? 0) - (b.student_count ?? 0),
+      desc: (a, b) => (b.student_count ?? 0) - (a.student_count ?? 0)
     }
   };
 </script>

@@ -14,6 +14,21 @@
     return new Date(p[2],p[1]-1,p[0]);
   }
 
+  function normalizeIntake(val){
+    if(val==null) return '';
+    const raw=String(val).trim().toLowerCase();
+    if(!raw) return '';
+    const compact=raw.replace(/\s+/g,'');
+    const match=compact.match(/^(?:trimester|semester|term|quarter|t|s|q)(\d)$/);
+    if(match){
+      return `trimester ${match[1]}`;
+    }
+    if(/^trimester\s*[1-4]$/.test(raw)){
+      return raw.replace(/\s+/g,' ');
+    }
+    return raw.replace(/\s+/g,' ');
+  }
+
   document.addEventListener('DOMContentLoaded',()=>{
     fetch('/api/data').then(r=>r.json()).then(data=>{
       rawData=data.map(r=>({
@@ -35,9 +50,8 @@
       });
     });
 
-    document.querySelectorAll('.intake-buttons button').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        btn.classList.toggle('active');
+    document.querySelectorAll('.intake-buttons input[type="checkbox"]').forEach(input=>{
+      input.addEventListener('change',()=>{
         applyFilters();
       });
     });
@@ -67,10 +81,10 @@
     if(rangeTo){
       data=data.filter(r=>r._start && r._start<=rangeTo);
     }
-    const intakes=Array.from(document.querySelectorAll('.intake-buttons button.active')).map(b=>b.dataset.sem);
+    const intakes=Array.from(document.querySelectorAll('.intake-buttons input[type="checkbox"]:checked')).map(b=>normalizeIntake(b.value||b.dataset.sem));
     if(intakes.length) data=data.filter(r=>{
-      const intake = r['Previous Offer Intake'] || r['previous_offer_intake'];
-      return intakes.includes(intake);
+      const intake = normalizeIntake(r['Previous Offer Intake'] || r['previous_offer_intake']);
+      return intake && intakes.includes(intake);
     });
 
     updateChart(data);

@@ -25,6 +25,23 @@
   padding: 0.25rem 0.5rem;
 }
 
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filter-actions .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.filter-options .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0;
+}
+
 .filters-panel .btn.active,
 .chart-options .chart-btn.active {
   background-color: var(--color-primary);

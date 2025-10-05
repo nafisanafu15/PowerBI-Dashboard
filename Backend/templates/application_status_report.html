@@ -1,6 +1,6 @@
 {% extends "global_layout.html" %}
 
-{% block title %}Application Status Report{% endblock %}
+{% block title %}Revenue Forecast Report{% endblock %}
 
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -10,52 +10,69 @@
 {% block content %}
 <div class="report-main container-fluid">
   <div class="row g-3">
-    <aside class="filters-panel col-lg-2">
+    <aside class="filters-panel col-lg-3">
       <h3 class="mb-3">Filters</h3>
       <div class="filter-group mb-3 time-filter">
         <label class="form-label fw-bold">Time Period</label>
         <div class="radio-group d-flex flex-column">
+          <label><input type="radio" name="time" value="all" checked> All time</label>
           <label><input type="radio" name="time" value="today"> Today</label>
           <label><input type="radio" name="time" value="week"> This week</label>
           <label><input type="radio" name="time" value="month"> This month</label>
           <label><input type="radio" name="time" value="year"> This year</label>
-          <label><input type="radio" name="time" value="custom"> Set up</label>
+          <label><input type="radio" name="time" value="custom"> Custom range</label>
         </div>
         <div class="date-range">
           <input type="text" class="time-range form-control form-control-sm" placeholder="Select range">
-          <div class="mt-2">
+          <div class="mt-2 d-flex gap-2">
             <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
             <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
           </div>
         </div>
       </div>
       <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Sort by</label>
-        <div class="sort-buttons d-flex flex-wrap">
-          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Ascending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Descending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="offer">Offer ID</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="status">Offer Status</button>
-        </div>
+        <label class="form-label fw-bold" for="filter-status">Status</label>
+        <select id="filter-status" class="form-select form-select-sm">
+          <option value="">All statuses</option>
+        </select>
       </div>
       <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Semester/Intake</label>
-        <div class="intake-buttons d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 1">Trimester 1</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 2">Trimester 2</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 3">Trimester 3</button>
+        <label class="form-label fw-bold" for="filter-agent">Agent</label>
+        <select id="filter-agent" class="form-select form-select-sm">
+          <option value="">All agents</option>
+        </select>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold" for="filter-course">Course Type</label>
+        <select id="filter-course" class="form-select form-select-sm">
+          <option value="">All course types</option>
+        </select>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold" for="filter-visa">Visa Status</label>
+        <select id="filter-visa" class="form-select form-select-sm">
+          <option value="">All visa statuses</option>
+        </select>
+      </div>
+      <div class="filter-group mb-3">
+        <label class="form-label fw-bold">Sort by</label>
+        <div class="sort-buttons d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary btn-sm" data-sort="revenue-desc">Revenue ↓</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="revenue-asc">Revenue ↑</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="students-desc">Students ↓</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="students-asc">Students ↑</button>
         </div>
       </div>
     </aside>
 
-    <section class="report-content col-lg-8">
-      <h1 class="mb-3 text-center">Application Status Report</h1>
-      <h2 class="h5 text-muted mb-4">Applications by Status</h2>
+    <section class="report-content col-lg-7">
+      <h1 class="mb-3 text-center">Revenue Forecast Report</h1>
+      <h2 class="h5 text-muted mb-4">Projected enrolment revenue for the next 12 months</h2>
       <canvas id="mainChart" class="mb-4" height="200"></canvas>
       <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Status</th><th>Applications</th></tr>
+            <tr><th>Month</th><th>Forecast Revenue</th><th>Students</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -65,9 +82,8 @@
     <aside class="chart-options col-lg-2">
       <h3 class="mb-3">Graphs and Charts</h3>
       <div class="d-flex flex-column gap-2">
-        <button class="btn btn-outline-primary chart-btn active" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i>Bar Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="doughnut"><i class="fa-solid fa-circle-notch me-1"></i>Donut Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="pie"><i class="fa-solid fa-chart-pie me-1"></i>Pie Chart</button>
+        <button class="btn btn-outline-primary chart-btn active" data-type="line"><i class="fa-solid fa-chart-line me-1"></i>Line Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i>Bar Chart</button>
         <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i>Table</button>
       </div>
     </aside>
@@ -76,24 +92,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
-<script>
-  window.reportConfig = {
-    endpoint: '/api/application-status',
-    groupField: 'status',
-    chartLabel: 'Applications',
-    intakeField: 'term',
-    columns: [
-      {key: 'status', label: 'Status'},
-      {key: 'total', label: 'Applications'}
-    ],
-    sortFns: {
-      asc: (a,b)=> (a.total??0) - (b.total??0),
-      desc: (a,b)=> (b.total??0) - (a.total??0),
-      offer: (a,b)=> String(a.offer||'').localeCompare(String(b.offer||'')),
-      status: (a,b)=> String(a.status||'').localeCompare(String(b.status||''))
-    }
-  };
-</script>
-<script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/pages/revenue-forecast-report.js') }}" type="module"></script>
 {% endblock %}
-

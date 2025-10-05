@@ -4,8 +4,8 @@
 {% block head %}
   <meta charset="UTF-8">
   <title>Managerial Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='Css/managerial_dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/managerial_dashboard.css') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
@@ -18,6 +18,7 @@
       <div class="filter-group time-filter">
         <h3>Filters</h3>
         <div class="radio-group">
+          <label><input type="radio" name="time" value="all" checked> All time</label>
           <label><input type="radio" name="time" value="today"> Today</label>
           <label><input type="radio" name="time" value="week"> This week</label>
           <label><input type="radio" name="time" value="month"> This month</label>
@@ -43,10 +44,15 @@
       </div>
       <div class="filter-group">
         <h3>Semester/Intake</h3>
-        <div class="intake-buttons">
-          <button data-sem="Trimester 1">Trimester 1</button>
-          <button data-sem="Trimester 2">Trimester 2</button>
-          <button data-sem="Trimester 3">Trimester 3</button>
+        <div class="intake-buttons btn-group-vertical" role="group" aria-label="Trimester filter">
+          <input type="checkbox" class="btn-check" id="mgr-trimester-1" value="Trimester 1" autocomplete="off" checked>
+          <label class="btn btn-outline-light mb-2" for="mgr-trimester-1">Trimester 1</label>
+
+          <input type="checkbox" class="btn-check" id="mgr-trimester-2" value="Trimester 2" autocomplete="off" checked>
+          <label class="btn btn-outline-light mb-2" for="mgr-trimester-2">Trimester 2</label>
+
+          <input type="checkbox" class="btn-check" id="mgr-trimester-3" value="Trimester 3" autocomplete="off" checked>
+          <label class="btn btn-outline-light" for="mgr-trimester-3">Trimester 3</label>
         </div>
       </div>
     </div>

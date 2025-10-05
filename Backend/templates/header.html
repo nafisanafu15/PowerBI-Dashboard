@@ -1,12 +1,12 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='Css/theme.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='Css/glass.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/glass.css') }}">
 
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm navbar-glass">
     <div class="container-fluid px-5">
       <a class="navbar-brand"
          href="{{ url_for('leader_dashboard') if session.get('role') == 'Leader' else url_for('dashboard') if session.get('role') else url_for('landing') }}">
-        <img src="{{ url_for('static', filename='Assets/logo.svg') }}" alt="JTrack Logo" />
+        <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="JTrack Logo" />
       </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"

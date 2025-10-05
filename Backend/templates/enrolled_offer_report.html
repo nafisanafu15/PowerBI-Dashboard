@@ -1,10 +1,11 @@
 {% extends "global_layout.html" %}
 
-{% block title %}Enrolled vs Offer Report{% endblock %}
+{% block title %}Students by Trimester Report{% endblock %}
 
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
@@ -13,49 +14,54 @@
     <aside class="filters-panel col-lg-2">
       <h3 class="mb-3">Filters</h3>
       <div class="filter-group mb-3 time-filter">
-        <label class="form-label fw-bold">Time Period</label>
+        <label class="form-label fw-bold">Timeline</label>
         <div class="radio-group d-flex flex-column">
-          <label><input type="radio" name="time" value="today"> Today</label>
-          <label><input type="radio" name="time" value="week"> This week</label>
-          <label><input type="radio" name="time" value="month"> This month</label>
-          <label><input type="radio" name="time" value="year"> This year</label>
-          <label><input type="radio" name="time" value="custom"> Set up</label>
+          <label><input type="radio" name="time" value="all" checked> All years</label>
+          <label><input type="radio" name="time" value="current_year"> Current year</label>
+          <label><input type="radio" name="time" value="last_12_months"> Last 12 months</label>
+          <label><input type="radio" name="time" value="last_24_months"> Last 24 months</label>
+          <label><input type="radio" name="time" value="custom"> Custom range</label>
         </div>
-        <div class="date-range">
+        <div class="date-range mt-2" style="display:none;">
           <input type="text" class="time-range form-control form-control-sm" placeholder="Select range">
-          <div class="mt-2">
+          <div class="mt-2 d-flex gap-2">
             <button type="button" class="btn btn-outline-primary btn-sm rounded-pill apply-range">Apply</button>
             <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill cancel-range">Cancel</button>
           </div>
         </div>
       </div>
+
       <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Sort by</label>
-        <div class="sort-buttons d-flex flex-wrap">
-          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Ascending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Descending</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="offer">Offer ID</button>
-          <button class="btn btn-outline-primary btn-sm" data-sort="status">Offer Status</button>
+        <label class="form-label fw-bold">Trimester</label>
+        <div class="intake-buttons btn-group" role="group" aria-label="Trimester filter">
+          <input type="checkbox" class="btn-check" id="trimester-t1" value="Trimester 1" autocomplete="off" checked>
+          <label class="btn btn-outline-primary btn-sm" for="trimester-t1">T1</label>
+
+          <input type="checkbox" class="btn-check" id="trimester-t2" value="Trimester 2" autocomplete="off" checked>
+          <label class="btn btn-outline-primary btn-sm" for="trimester-t2">T2</label>
+
+          <input type="checkbox" class="btn-check" id="trimester-t3" value="Trimester 3" autocomplete="off" checked>
+          <label class="btn btn-outline-primary btn-sm" for="trimester-t3">T3</label>
         </div>
       </div>
+
       <div class="filter-group mb-3">
-        <label class="form-label fw-bold">Semester/Intake</label>
-        <div class="intake-buttons d-flex flex-wrap gap-2">
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 1">Trimester 1</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 2">Trimester 2</button>
-          <button class="btn btn-outline-primary btn-sm" data-sem="Trimester 3">Trimester 3</button>
+        <label class="form-label fw-bold">Sort by</label>
+        <div class="sort-buttons d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary btn-sm" data-sort="asc">Lowest student count</button>
+          <button class="btn btn-outline-primary btn-sm" data-sort="desc">Highest student count</button>
         </div>
       </div>
     </aside>
 
     <section class="report-content col-lg-8">
-      <h1 class="mb-3 text-center">Enrolled vs Offer Report</h1>
-      <h2 class="h5 text-muted mb-4">Offers vs Enrolled Students</h2>
-      <canvas id="mainChart" class="mb-4" height="200"></canvas>
+      <h1 class="mb-3 text-center">Students by Trimester</h1>
+      <p class="text-muted text-center mb-4">Track student volumes for each intake period and filter by trimester or start-date windows.</p>
+      <canvas id="mainChart" class="mb-4" height="220"></canvas>
       <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-sm">
           <thead class="table-light">
-            <tr><th>Term</th><th>Offers</th><th>Enrolled</th></tr>
+            <tr><th>Term</th><th>Students</th><th>Trimester</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -65,36 +71,32 @@
     <aside class="chart-options col-lg-2">
       <h3 class="mb-3">Graphs and Charts</h3>
       <div class="d-flex flex-column gap-2">
-        <button class="btn btn-outline-primary chart-btn active" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i>Bar Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="doughnut"><i class="fa-solid fa-circle-notch me-1"></i>Donut Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="pie"><i class="fa-solid fa-chart-pie me-1"></i>Pie Chart</button>
-        <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i>Table</button>
+        <button class="btn btn-outline-primary chart-btn active" data-type="bar"><i class="fa-solid fa-chart-column me-1"></i> Bar Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="line"><i class="fa-solid fa-chart-line me-1"></i> Line Chart</button>
+        <button class="btn btn-outline-primary chart-btn" data-type="table"><i class="fa-solid fa-table me-1"></i> Table</button>
       </div>
     </aside>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/time_period_filter.js') }}"></script>
 <script>
   window.reportConfig = {
-    endpoint: '/api/enrolled-vs-offer',
+    endpoint: '/api/students-by-trimester',
     groupField: 'term',
-    chartLabel: 'Offers',
-    intakeField: 'term',
     columns: [
-      {key: 'term', label: 'Term'},
-      {key: 'offers', label: 'Offers'},
-      {key: 'enrolled', label: 'Enrolled'}
+      { key: 'term', label: 'Term', isMetric: false },
+      { key: 'student_count', label: 'Students', isMetric: true },
+      { key: 'trimester', label: 'Trimester', isMetric: false }
     ],
+    intakeField: 'trimester',
+    dateField: 'first_start_date',
+    extraFields: ['trimester', 'first_start_date'],
     sortFns: {
-      asc: (a,b)=> (a.offers??0) - (b.offers??0),
-      desc: (a,b)=> (b.offers??0) - (a.offers??0),
-      offer: (a,b)=> String(a.offer||'').localeCompare(String(b.offer||'')),
-      status: (a,b)=> String(a.status||'').localeCompare(String(b.status||''))
+      asc: (a, b) => (a.student_count ?? 0) - (b.student_count ?? 0),
+      desc: (a, b) => (b.student_count ?? 0) - (a.student_count ?? 0)
     }
   };
 </script>
 <script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
 {% endblock %}
-
