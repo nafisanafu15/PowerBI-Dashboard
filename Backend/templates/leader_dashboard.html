@@ -13,7 +13,7 @@
 </section>
 
 <section class="dashboard-body">
-  <div class="charts-container">
+  <div class="charts-container" data-download-section="charts">
     <div class="chart-card">
       <h3>Revenue Forecast</h3>
       <button class="view-report" onclick="location.href='{{ url_for('application_status_report') }}'">View
@@ -39,14 +39,14 @@
     </div>
   </div>
 
-  <aside class="kpi-storyboards">
+  <aside class="kpi-storyboards" data-download-section="storyboards">
     <h2 class="kpi-storyboards__title">Storyboards</h2>
     <p class="kpi-storyboards__timestamp" id="storyboards-updated"></p>
     <div class="kpi-storyboards__list" id="leader-storyboard-card-container" role="list" aria-live="polite"></div>
     <p class="kpi-storyboards__note">Tap a storyboard to explore the full AI insight.</p>
   </aside>
 
-  <div class="storyboard-modal" id="storyboard-modal" aria-hidden="true">
+  <div class="storyboard-modal" id="storyboard-modal" aria-hidden="true" data-download-ignore>
     <div class="storyboard-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="storyboard-modal-title"
       tabindex="-1">
       <button type="button" class="storyboard-modal__close" data-modal-dismiss

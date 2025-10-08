@@ -1,11 +1,11 @@
 import json
 import os
 import re
-from datetime import datetime, timezone, date
-from functools import wraps
+from datetime import datetime, timezone, date, timedelta
+from functools import lru_cache, wraps
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Pattern, Tuple
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -42,6 +42,15 @@ USERS_DB = DATA_DIR / "users.db"
 
 # Keep offer expiry surge focused on roughly the last/next 12 months.
 OFFER_EXPIRY_LOOKAHEAD_DAYS = 365
+MONTHLY_INTAKE_TARGET = 8
+
+
+def _format_currency(value: float) -> str:
+    return f"${value:,.2f}"
+
+
+def _format_percentage(value: float) -> str:
+    return f"{value:.1f}%"
 
 def init_db():
     # Create users table if it does not already exist
@@ -329,6 +338,118 @@ def _build_revenue_forecast_rows() -> List[dict]:
         subset['paid_fees'] = 0.0
     subset['paid_fees'] = subset['paid_fees'].astype(float)
     return subset.to_dict(orient='records')
+
+
+def _decode_possible_numeric(value: Any) -> Any:
+    """Best-effort conversion for SQLite blobs that encode integers/floats."""
+
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            return int.from_bytes(value, byteorder="little", signed=False)
+        except Exception:
+            return None
+    return value
+
+
+@lru_cache(maxsize=1)
+def _load_chat_dataframe() -> pd.DataFrame:
+    """Return a standardised dataframe for conversational analytics."""
+
+    raw = _load_report_dataframe()
+    if raw.empty:
+        return pd.DataFrame()
+
+    frame = raw.copy()
+    rename_map = {
+        "Student_Id": "student_id",
+        "First_Name": "first_name",
+        "Last_Name": "last_name",
+        "Age": "age",
+        "Campus_Name": "campus_name",
+        "Nationality": "nationality",
+        "Visa_Status": "visa_status",
+        "Course_Type": "course_type",
+        "Course_Id": "course_id",
+        "Course_Name": "course_name",
+        "Enrolment_Fees": "enrolment_fees",
+        "Paid_Fees": "paid_fees",
+        "Offer_Id": "offer_id",
+        "Agent_Name": "agent_name",
+        "Status": "status",
+        "Course_Manager": "course_manager",
+        "Start_Date": "start_date",
+        "Finish_Date": "finish_date",
+        "Study_Reason": "study_reason",
+        "Mode_of_Study": "mode_of_study",
+        "Offer_Expiry_Date": "offer_expiry_date",
+        "Trimester": "trimester",
+        "Offer_Year": "offer_year",
+    }
+    frame = frame.rename(columns=rename_map)
+
+    if "student_id" not in frame.columns:
+        frame["student_id"] = ""
+
+    numeric_columns = ["enrolment_fees", "paid_fees", "age", "offer_year"]
+    for column in numeric_columns:
+        if column in frame.columns:
+            frame[column] = pd.to_numeric(
+                frame[column].map(_decode_possible_numeric),
+                errors="coerce",
+            )
+
+    date_columns = ["start_date", "finish_date", "offer_expiry_date"]
+    for column in date_columns:
+        if column in frame.columns:
+            frame[column] = pd.to_datetime(frame[column], errors="coerce")
+
+    frame["status"] = (
+        frame.get("status", "")
+        .astype(str)
+        .str.strip()
+    )
+    frame["status_normalised"] = frame["status"].str.lower()
+    frame["is_enrolled"] = frame["status_normalised"].str.startswith("enrol")
+    frame["is_offered"] = frame["status_normalised"].str.contains("offer")
+    frame["is_withdrawn"] = frame["status_normalised"].str.contains("withdraw")
+
+    frame["enrolment_fees"] = frame.get("enrolment_fees", 0).fillna(0.0)
+    frame["paid_fees"] = frame.get("paid_fees", 0).fillna(0.0)
+
+    frame["outstanding_amount"] = frame["enrolment_fees"] - frame["paid_fees"]
+    frame["outstanding_amount"] = frame["outstanding_amount"].clip(lower=0.0)
+
+    return frame
+
+
+def _current_timestamp() -> pd.Timestamp:
+    return pd.Timestamp.utcnow().tz_localize(None)
+
+
+def _describe_quarter(period: pd.Period) -> str:
+    return f"Q{period.quarter} {period.year}"
+
+
+def _filter_by_date(
+    frame: pd.DataFrame,
+    *,
+    start: Optional[pd.Timestamp] = None,
+    end: Optional[pd.Timestamp] = None,
+    column: str = "start_date",
+) -> pd.DataFrame:
+    if column not in frame.columns:
+        return frame.iloc[0:0]
+
+    working = frame[frame[column].notna()].copy()
+    if working.empty:
+        return working
+
+    mask = pd.Series(True, index=working.index)
+    if start is not None:
+        mask &= working[column] >= start
+    if end is not None:
+        mask &= working[column] < end
+    return working.loc[mask]
 
 
 def _build_agent_performance_rows() -> List[dict]:
@@ -642,6 +763,14 @@ AI_CHAT_ROLE_CONTEXT = {
     },
 }
 
+
+def _role_followups(role: str) -> List[str]:
+    context = AI_CHAT_ROLE_CONTEXT.get(role or "default")
+    if not context:
+        context = AI_CHAT_ROLE_CONTEXT["default"]
+    return context.get("follow_ups", AI_CHAT_DEFAULT_FOLLOW_UPS)
+
+
 AI_CHAT_TOPICS = [
     {
         "keywords": {
@@ -806,6 +935,1155 @@ AI_CHAT_TOPICS = [
 ]
 
 
+def _respond_fee_collection_vs_last_quarter(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    working = frame.copy()
+    working = working[working["start_date"].notna()]
+    if working.empty:
+        return (
+            "I couldn't find start dates in the dataset, so I can't compare quarterly fee collection right now.",
+            _role_followups(role),
+        )
+
+    working["quarter"] = working["start_date"].dt.to_period("Q")
+    periods = sorted(working["quarter"].dropna().unique())
+    if not periods:
+        return (
+            "I couldn't identify any quarters in the dataset to compare fee collection.",
+            _role_followups(role),
+        )
+
+    current_period = periods[-1]
+    previous_period = periods[-2] if len(periods) > 1 else current_period - 1
+
+    current_total = float(working.loc[working["quarter"] == current_period, "paid_fees"].sum())
+    previous_total = float(working.loc[working["quarter"] == previous_period, "paid_fees"].sum())
+
+    delta_value = current_total - previous_total
+    if previous_total > 0:
+        delta_pct = (delta_value / previous_total) * 100
+        change_text = (
+            f"{_format_currency(abs(delta_value))} ({_format_percentage(abs(delta_pct))})"
+            f" {'increase' if delta_value >= 0 else 'decrease'}"
+        )
+    else:
+        change_text = f"{_format_currency(delta_value)} change"
+
+    response = (
+        f"Paid fees this quarter ({_describe_quarter(current_period)}) total {_format_currency(current_total)}, "
+        f"compared with {_format_currency(previous_total)} in {_describe_quarter(previous_period)}. "
+        f"That works out to a {change_text}."
+    )
+
+    outstanding = float(working.loc[working["quarter"] == current_period, "outstanding_amount"].sum())
+    if outstanding > 0:
+        response += f" Outstanding invoices for the current quarter sit at {_format_currency(outstanding)}."
+
+    return response, _role_followups(role)
+
+
+def _respond_revenue_trend_12_months(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp().replace(day=1)
+    start_window = today - pd.DateOffset(months=12)
+    working = _filter_by_date(frame, start=start_window, end=today + pd.DateOffset(months=1))
+    if working.empty:
+        return (
+            "There are no records with start dates in the last 12 months to analyse revenue growth.",
+            _role_followups(role),
+        )
+
+    working["month"] = working["start_date"].dt.to_period("M")
+    grouped = (
+        working.groupby("month", dropna=False)["paid_fees"].sum().sort_index()
+    )
+
+    first_month = grouped.index[0]
+    last_month = grouped.index[-1]
+    first_value = float(grouped.iloc[0])
+    last_value = float(grouped.iloc[-1])
+    if first_value > 0:
+        growth_pct = ((last_value - first_value) / first_value) * 100
+    else:
+        growth_pct = 0.0
+
+    peak_month = grouped.idxmax()
+    trough_month = grouped.idxmin()
+
+    response = (
+        f"Over the last 12 months revenue grew from {_format_currency(first_value)} in {first_month.strftime('%b %Y')} "
+        f"to {_format_currency(last_value)} in {last_month.strftime('%b %Y')}, a change of {_format_percentage(growth_pct)}. "
+        f"The strongest month was {peak_month.strftime('%b %Y')} at {_format_currency(float(grouped.max()))}, "
+        f"while {trough_month.strftime('%b %Y')} was the softest at {_format_currency(float(grouped.min()))}."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_highest_profit_margin(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "course_name" not in frame.columns:
+        return (
+            "The dataset doesn't include course names, so I can't determine program margins.",
+            _role_followups(role),
+        )
+
+    working = frame[frame["is_enrolled"]].copy()
+    if working.empty:
+        return (
+            "There are no enrolled students in the dataset to calculate program margins.",
+            _role_followups(role),
+        )
+
+    grouped = working.groupby("course_name").agg(
+        paid_total=("paid_fees", "sum"),
+        outstanding_total=("outstanding_amount", "sum"),
+        enrolments=("student_id", "nunique"),
+    )
+    grouped = grouped[grouped["paid_total"] > 0]
+    if grouped.empty:
+        return (
+            "Paid fee totals are zero, so I can't compute profit margins.",
+            _role_followups(role),
+        )
+
+    grouped["margin_pct"] = (
+        (grouped["paid_total"] - grouped["outstanding_total"]) / grouped["paid_total"]
+    ) * 100
+    grouped = grouped.sort_values("margin_pct", ascending=False)
+    top_row = grouped.iloc[0]
+
+    response_lines = [
+        (
+            f"{grouped.index[0]} shows the highest net margin proxy at {_format_percentage(top_row['margin_pct'])} "
+            f"across {int(top_row['enrolments'])} enrolled students."
+        )
+    ]
+
+    if len(grouped) > 1:
+        runner_up = grouped.iloc[1]
+        response_lines.append(
+            f"Next best is {grouped.index[1]} at {_format_percentage(runner_up['margin_pct'])}."
+        )
+
+    response_lines.append(
+        "Margin is calculated as paid fees minus outstanding balances, so it reflects programs that have collected cash and "
+        "aren't carrying large unpaid invoices."
+    )
+
+    return " ".join(response_lines), _role_followups(role)
+
+
+def _respond_cash_flow_status(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp()
+    lookback_start = today - pd.Timedelta(days=30)
+    recent = _filter_by_date(frame, start=lookback_start, end=today + pd.Timedelta(days=1))
+    cash_in = float(recent["paid_fees"].sum()) if not recent.empty else 0.0
+
+    outstanding = float(frame["outstanding_amount"].sum())
+    overdue = frame.loc[
+        (frame["outstanding_amount"] > 0)
+        & frame["start_date"].notna()
+        & (frame["start_date"] < lookback_start),
+        "outstanding_amount",
+    ].sum()
+
+    response = (
+        f"Cash collected over the last 30 days totals {_format_currency(cash_in)}. "
+        f"Outstanding invoices across all cohorts sit at {_format_currency(outstanding)}"
+    )
+    if overdue > 0:
+        response += f", with {_format_currency(float(overdue))} tied to intakes that started more than 30 days ago."
+    else:
+        response += "."
+
+    return response, _role_followups(role)
+
+
+def _respond_budget_vs_actual_ytd(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp()
+    start_of_year = today.replace(month=1, day=1)
+    ytd = _filter_by_date(frame, start=start_of_year, end=today + pd.Timedelta(days=1))
+    if ytd.empty:
+        return (
+            "There are no current-year records to compare budget and actual spend.",
+            _role_followups(role),
+        )
+
+    budget = float(ytd["enrolment_fees"].sum())
+    actual = float(ytd["paid_fees"].sum())
+    utilisation = (actual / budget * 100) if budget > 0 else 0.0
+
+    response = (
+        f"Year-to-date invoiced fees (budget proxy) total {_format_currency(budget)} while actual cash received is "
+        f"{_format_currency(actual)}, giving a utilisation of {_format_percentage(utilisation)}."
+    )
+
+    shortfall = budget - actual
+    if shortfall > 0:
+        response += f" That leaves {_format_currency(shortfall)} still to be collected against the budget."
+
+    return response, _role_followups(role)
+
+
+def _respond_enrolment_growth_rate(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    working = frame[frame["is_enrolled"] & frame["start_date"].notna()].copy()
+    if working.empty:
+        return (
+            "There are no enrolled records with start dates to calculate growth.",
+            _role_followups(role),
+        )
+
+    working["year"] = working["start_date"].dt.year
+    grouped = working.groupby("year")["student_id"].nunique().sort_index()
+    if grouped.empty:
+        return (
+            "I couldn't determine enrolment counts by year from the available data.",
+            _role_followups(role),
+        )
+
+    current_year = grouped.index[-1]
+    previous_year = grouped.index[-2] if len(grouped) > 1 else current_year - 1
+    current_total = int(grouped.loc[current_year])
+    previous_total = int(grouped.loc[previous_year]) if previous_year in grouped.index else 0
+
+    if previous_total > 0:
+        growth_pct = ((current_total - previous_total) / previous_total) * 100
+        change_text = _format_percentage(growth_pct)
+    else:
+        change_text = "n/a"
+
+    response = (
+        f"Enrolments this year ({current_year}) total {current_total} compared with {previous_total} last year. "
+        f"That equates to a growth rate of {change_text}."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_kpi_summary_last_month(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp().replace(day=1)
+    last_month_start = today - pd.DateOffset(months=1)
+    last_month_end = today
+    working = _filter_by_date(frame, start=last_month_start, end=last_month_end)
+    if working.empty:
+        return (
+            "There are no records from last month to summarise KPIs.",
+            _role_followups(role),
+        )
+
+    applications = int(working["student_id"].nunique())
+    offers = int(working[working["is_offered"]]["student_id"].nunique())
+    enrolments = int(working[working["is_enrolled"]]["student_id"].nunique())
+    revenue = float(working["paid_fees"].sum())
+
+    if offers > 0:
+        conversion_rate = enrolments / offers * 100
+    else:
+        conversion_rate = 0.0
+
+    response = (
+        f"Last month we processed {applications} applications, issued {offers} offers, and confirmed {enrolments} enrolments. "
+        f"Cash collected was {_format_currency(revenue)}, giving an offer-to-enrolment conversion rate of "
+        f"{_format_percentage(conversion_rate)}."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_key_risks_trending(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp()
+    recent_start = today - pd.Timedelta(days=30)
+    prior_start = today - pd.Timedelta(days=60)
+
+    recent_withdrawals = _filter_by_date(frame[frame["is_withdrawn"]], start=recent_start, end=today)
+    prior_withdrawals = _filter_by_date(frame[frame["is_withdrawn"]], start=prior_start, end=recent_start)
+
+    recent_count = int(recent_withdrawals["student_id"].nunique()) if not recent_withdrawals.empty else 0
+    prior_count = int(prior_withdrawals["student_id"].nunique()) if not prior_withdrawals.empty else 0
+
+    overdue = frame.loc[
+        (frame["outstanding_amount"] > 0)
+        & frame["start_date"].notna()
+        & (frame["start_date"] < recent_start),
+        "student_id",
+    ].nunique()
+
+    response_parts = []
+    if prior_count == 0 and recent_count == 0:
+        response_parts.append("Withdrawals have stayed flat over the last 60 days.")
+    else:
+        delta = recent_count - prior_count
+        if prior_count > 0:
+            pct = (delta / prior_count) * 100
+            trend_text = f"{_format_percentage(abs(pct))} {'increase' if delta >= 0 else 'decrease'}"
+        else:
+            trend_text = "increase" if delta > 0 else "decrease"
+        response_parts.append(
+            f"Withdrawn applications moved from {prior_count} to {recent_count} over the last 30 days, a {trend_text}."
+        )
+
+    if overdue > 0:
+        response_parts.append(
+            f"There are also {overdue} enrolments carrying unpaid balances beyond 30 days, which is a key financial risk."
+        )
+
+    return " ".join(response_parts), _role_followups(role)
+
+
+def _respond_retention_rate_top_programs(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "course_name" not in frame.columns:
+        return (
+            "Course names are missing from the dataset, so I can't calculate retention rates by program.",
+            _role_followups(role),
+        )
+
+    relevant = frame[(frame["is_enrolled"] | frame["is_withdrawn"]) & frame["course_name"].notna()]
+    if relevant.empty:
+        return (
+            "There are no enrolled or withdrawn records to compute retention rates.",
+            _role_followups(role),
+        )
+
+    grouped = relevant.groupby(["course_name", "is_enrolled"]).agg(count=("student_id", "nunique")).reset_index()
+    pivot = grouped.pivot_table(index="course_name", columns="is_enrolled", values="count", fill_value=0)
+    pivot.columns = ["withdrawn", "enrolled"]
+    pivot = pivot.sort_values("enrolled", ascending=False)
+    top_programs = pivot.head(3)
+
+    lines = []
+    for course, row in top_programs.iterrows():
+        total = row["enrolled"] + row["withdrawn"]
+        if total == 0:
+            continue
+        retention = row["enrolled"] / total * 100
+        lines.append(
+            f"{course}: {_format_percentage(retention)} retention ({int(row['enrolled'])} of {int(total)} students staying)."
+        )
+
+    if not lines:
+        lines.append("No retention data was available for the top programs.")
+
+    return " ".join(lines), _role_followups(role)
+
+
+def _respond_geographic_breakdown_students(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "nationality" not in frame.columns:
+        return (
+            "Nationality data is not present, so I can't produce a geographic breakdown.",
+            _role_followups(role),
+        )
+
+    current_students = frame[frame["is_enrolled"]]
+    if current_students.empty:
+        return (
+            "There are no enrolled students to analyse for geographic distribution.",
+            _role_followups(role),
+        )
+
+    breakdown = (
+        current_students.groupby("nationality")["student_id"]
+        .nunique()
+        .sort_values(ascending=False)
+    )
+    total = int(breakdown.sum())
+    top_entries = breakdown.head(5)
+
+    lines = ["Current students by nationality:"]
+    for country, count in top_entries.items():
+        share = (count / total * 100) if total else 0
+        lines.append(f"- {country}: {count} students ({_format_percentage(share)})")
+
+    if total > top_entries.sum():
+        remainder = total - int(top_entries.sum())
+        lines.append(f"- Others: {remainder} students")
+
+    return " \n".join(lines), _role_followups(role)
+
+
+def _respond_agent_highest_value_intakes(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "agent_name" not in frame.columns:
+        return (
+            "Agent information isn't available, so I can't calculate intake value by group.",
+            _role_followups(role),
+        )
+
+    enrolled = frame[frame["is_enrolled"]]
+    if enrolled.empty:
+        return (
+            "There are no enrolled records to analyse agent intake value.",
+            _role_followups(role),
+        )
+
+    totals = (
+        enrolled.groupby("agent_name")["paid_fees"].sum().sort_values(ascending=False)
+    )
+    top_agent = totals.index[0]
+    top_value = float(totals.iloc[0])
+
+    response = (
+        f"{top_agent} has generated the highest paid-fee intake so far at {_format_currency(top_value)}."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_average_cost_per_acquisition(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    enrolled = frame[frame["is_enrolled"]]
+    if enrolled.empty:
+        return (
+            "There are no enrolled records to estimate acquisition costs.",
+            _role_followups(role),
+        )
+
+    cost_proxy = float(enrolled["outstanding_amount"].sum())
+    enrol_count = int(enrolled["student_id"].nunique())
+    if enrol_count == 0:
+        return (
+            "I couldn't find any enrolments to calculate cost per acquisition.",
+            _role_followups(role),
+        )
+
+    average_cost = cost_proxy / enrol_count
+    response = (
+        "The dataset doesn't include marketing spend, so I'm using outstanding balances as an acquisition cost proxy. "
+        f"That puts the average cost per enrolled student at {_format_currency(average_cost)} across {enrol_count} students."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_top_agents_last_quarter(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "agent_name" not in frame.columns or "start_date" not in frame.columns:
+        return (
+            "Agent start-date data is missing, so I can't rank last quarter's revenue.",
+            _role_followups(role),
+        )
+
+    working = frame[frame["start_date"].notna() & frame["is_enrolled"]].copy()
+    if working.empty:
+        return (
+            "There are no enrolled students with start dates for last quarter analysis.",
+            _role_followups(role),
+        )
+
+    working["quarter"] = working["start_date"].dt.to_period("Q")
+    quarters = sorted(working["quarter"].dropna().unique())
+    if not quarters:
+        return (
+            "I couldn't identify quarter information in the dataset.",
+            _role_followups(role),
+        )
+
+    last_quarter = quarters[-1]
+    current_quarter = _current_timestamp().to_period("Q")
+    if last_quarter == current_quarter and len(quarters) > 1:
+        last_quarter = quarters[-2]
+
+    filtered = working[working["quarter"] == last_quarter]
+    if filtered.empty:
+        return (
+            "There are no enrolments recorded in the most recent completed quarter.",
+            _role_followups(role),
+        )
+
+    leaderboard = (
+        filtered.groupby("agent_name")["paid_fees"].sum().sort_values(ascending=False)
+    )
+    top_n = leaderboard.head(3)
+
+    lines = [f"Top agents for {_describe_quarter(last_quarter)} by paid fees:"]
+    for agent, value in top_n.items():
+        lines.append(f"- {agent}: {_format_currency(float(value))}")
+
+    return " \n".join(lines), _role_followups(role)
+
+
+def _respond_agent_turnover_trend(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "agent_name" not in frame.columns or "start_date" not in frame.columns:
+        return (
+            "Agent start-date data isn't available, so I can't infer turnover trends.",
+            _role_followups(role),
+        )
+
+    working = frame[frame["start_date"].notna() & frame["is_enrolled"]].copy()
+    if working.empty:
+        return (
+            "There are no enrolled records with start dates to trend agent turnover.",
+            _role_followups(role),
+        )
+
+    working["quarter"] = working["start_date"].dt.to_period("Q")
+    quarters = sorted(working["quarter"].dropna().unique())
+    if len(quarters) < 2:
+        return (
+            "I need at least two quarters of data to comment on turnover trends.",
+            _role_followups(role),
+        )
+
+    latest, previous = quarters[-1], quarters[-2]
+    current_agents = working.loc[working["quarter"] == latest, "agent_name"].nunique()
+    previous_agents = working.loc[working["quarter"] == previous, "agent_name"].nunique()
+
+    if previous_agents == 0:
+        trend_text = "no baseline from the prior quarter"
+    else:
+        change_pct = ((current_agents - previous_agents) / previous_agents) * 100
+        direction = "increase" if change_pct >= 0 else "decrease"
+        trend_text = f"{_format_percentage(abs(change_pct))} {direction}"
+
+    response = (
+        f"Active agents moved from {previous_agents} in {_describe_quarter(previous)} to {current_agents} in {_describe_quarter(latest)}, "
+        f"indicating {trend_text} in active representation."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_fee_increase_projection(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    amount_text = match.group("amount") if match and "amount" in match.groupdict() else None
+    try:
+        increase_amount = float(amount_text.replace(",", "")) if amount_text else 0.0
+    except Exception:
+        increase_amount = 0.0
+
+    if increase_amount == 0:
+        return (
+            "Please specify the fee uplift (for example, $250) so I can project Q3 revenue.",
+            _role_followups(role),
+        )
+
+    working = frame[frame["start_date"].notna()].copy()
+    if working.empty:
+        return (
+            "There are no start dates in the dataset to model the Q3 uplift.",
+            _role_followups(role),
+        )
+
+    working["quarter"] = working["start_date"].dt.to_period("Q")
+    target_year = _current_timestamp().year
+    q3_period = pd.Period(f"{target_year}Q3")
+    q3_records = working[working["quarter"] == q3_period]
+    if q3_records.empty():
+        return (
+            f"I couldn't find any Q3 {target_year} intakes to model the fee increase.",
+            _role_followups(role),
+        )
+
+    student_count = int(q3_records["student_id"].nunique())
+    baseline_revenue = float(q3_records["enrolment_fees"].sum())
+    uplift = increase_amount * student_count
+    projected = baseline_revenue + uplift
+
+    response = (
+        f"With a ${increase_amount:,.2f} increase per student, projected Q3 revenue rises from {_format_currency(baseline_revenue)} "
+        f"to {_format_currency(projected)}, adding {_format_currency(uplift)} across {student_count} students."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_predicted_intake_next_semester(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    working = frame[frame["start_date"].notna()].copy()
+    if working.empty:
+        return (
+            "There are no start dates available to project the next semester's intake.",
+            _role_followups(role),
+        )
+
+    working["month"] = working["start_date"].dt.to_period("M")
+    months = working["month"].dropna().unique()
+    if len(months) == 0:
+        return (
+            "I couldn't determine recent intake volumes for forecasting.",
+            _role_followups(role),
+        )
+
+    latest_month = max(months)
+    window_start = latest_month - 2
+    mask = (working["month"] >= window_start) & (working["month"] <= latest_month)
+    trailing = working.loc[mask]
+    avg_monthly = trailing.groupby("month")["student_id"].nunique().mean()
+    projection = int(round(avg_monthly * 4))
+
+    response = (
+        f"Based on the last three months of confirmed intakes, expect roughly {projection} students next semester "
+        f"(using an average of {avg_monthly:.1f} enrolments per month)."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_yoy_growth_projection(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    working = frame[frame["is_enrolled"] & frame["start_date"].notna()].copy()
+    if working.empty:
+        return (
+            "There are no enrolled records with start dates to project year-over-year growth.",
+            _role_followups(role),
+        )
+
+    working["year"] = working["start_date"].dt.year
+    grouped = working.groupby("year")["student_id"].nunique().sort_index()
+    if len(grouped) < 2:
+        return (
+            "I need at least two years of enrolment history to project growth.",
+            _role_followups(role),
+        )
+
+    current_year = grouped.index[-1]
+    previous_year = grouped.index[-2]
+    current_total = grouped.iloc[-1]
+    previous_total = grouped.iloc[-2]
+
+    if previous_total > 0:
+        yoy_growth = (current_total - previous_total) / previous_total
+    else:
+        yoy_growth = 0.0
+
+    projection = int(round(current_total * (1 + yoy_growth)))
+
+    response = (
+        f"Enrolments grew from {previous_total} in {previous_year} to {current_total} in {current_year} ({_format_percentage(yoy_growth * 100)}). "
+        f"Maintaining that trajectory implies around {projection} students next year."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_new_applications_this_week(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp()
+    week_start = today - pd.Timedelta(days=today.weekday())
+    week_end = week_start + pd.Timedelta(days=7)
+    subset = _filter_by_date(frame, start=week_start, end=week_end)
+    if subset.empty:
+        return (
+            "No applications were logged for the current week so far.",
+            _role_followups(role),
+        )
+
+    active = subset[~subset["is_withdrawn"]]
+    count = int(active["student_id"].nunique())
+    response = (
+        f"We recorded {count} new applications this week (from {week_start.date()} to {(week_end - pd.Timedelta(days=1)).date()})."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_conversion_rate_30_days(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    today = _current_timestamp()
+    window_start = today - pd.Timedelta(days=30)
+    recent = _filter_by_date(frame, start=window_start, end=today + pd.Timedelta(days=1))
+    if recent.empty:
+        return (
+            "No applications were recorded in the last 30 days, so the conversion rate is 0%.",
+            _role_followups(role),
+        )
+
+    applications = int(recent[recent["is_offered"]]["student_id"].nunique())
+    enrolments = int(recent[recent["is_enrolled"]]["student_id"].nunique())
+    if applications > 0:
+        rate = enrolments / applications * 100
+    else:
+        rate = 0.0
+
+    response = (
+        f"Over the last 30 days we converted {enrolments} of {applications} offers into enrolments, for a conversion rate of "
+        f"{_format_percentage(rate)}."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_withdrawn_pending_list(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    withdrawn = frame[frame["is_withdrawn"]]
+    if withdrawn.empty:
+        return (
+            "There are no applications currently marked as withdrawn.",
+            _role_followups(role),
+        )
+
+    columns = []
+    if "course_name" in frame.columns:
+        columns.append("course_name")
+    if "agent_name" in frame.columns:
+        columns.append("agent_name")
+
+    records = []
+    for _, row in withdrawn.head(5).iterrows():
+        details = [row.get("student_id", "Unknown")]
+        if "course_name" in columns:
+            details.append(row.get("course_name", ""))
+        if "agent_name" in columns:
+            details.append(f"Agent: {row.get('agent_name', '')}")
+        if pd.notna(row.get("start_date")):
+            details.append(f"Start {row['start_date'].date()}")
+        records.append(" – ".join(str(part) for part in details if part))
+
+    response = "Withdrawn stage items:\n" + "\n".join(f"- {line}" for line in records)
+    if len(withdrawn) > 5:
+        response += f"\n...and {len(withdrawn) - 5} more."
+
+    return response, _role_followups(role)
+
+
+def _respond_students_pending_payment(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    pending = frame[(frame["is_enrolled"] | frame["is_offered"]) & (frame["paid_fees"] < frame["enrolment_fees"])]
+    if pending.empty:
+        return (
+            "All students have settled their enrolment fees.",
+            _role_followups(role),
+        )
+
+    lines = []
+    for _, row in pending.head(5).iterrows():
+        outstanding = row["enrolment_fees"] - row["paid_fees"]
+        text = f"{row.get('student_id', 'Unknown')} owes {_format_currency(outstanding)}"
+        if "course_name" in row and row["course_name"]:
+            text += f" ({row['course_name']})"
+        lines.append(text)
+
+    response = "Students pending fee payment:\n" + "\n".join(f"- {line}" for line in lines)
+    if len(pending) > 5:
+        response += f"\n...and {len(pending) - 5} more awaiting payment."
+
+    return response, _role_followups(role)
+
+
+def _respond_agent_successful_intakes(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    agent_name = match.group("agent") if match and "agent" in match.groupdict() else ""
+    agent_name = (agent_name or "").strip(" \"'?.!")
+    agent_name = re.sub(r"^agent\s+", "", agent_name, flags=re.IGNORECASE)
+    if not agent_name:
+        return (
+            "Please tell me which agent you want to check.",
+            _role_followups(role),
+        )
+
+    if "agent_name" not in frame.columns:
+        return (
+            "Agent information isn't available in the dataset.",
+            _role_followups(role),
+        )
+
+    mask = frame["agent_name"].str.contains(agent_name, case=False, na=False)
+    matched = frame[mask & frame["is_enrolled"]]
+    count = int(matched["student_id"].nunique())
+    revenue = float(matched["paid_fees"].sum())
+
+    if count == 0:
+        response = f"I couldn't find any successful intakes for {agent_name}."
+    else:
+        response = (
+            f"{agent_name} has {count} confirmed intakes worth {_format_currency(revenue)} in collected fees."
+        )
+
+    return response, _role_followups(role)
+
+
+def _respond_compare_intake_volume_agents(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "agent_name" not in frame.columns:
+        return (
+            "Agent-level data isn't available to compare volumes.",
+            _role_followups(role),
+        )
+
+    enrolled = frame[frame["is_enrolled"]]
+    if enrolled.empty:
+        return (
+            "No enrolled records exist to compare agent intake volumes.",
+            _role_followups(role),
+        )
+
+    counts = (
+        enrolled.groupby("agent_name")["student_id"].nunique().sort_values(ascending=False)
+    )
+    top = counts.head(3)
+    bottom = counts.tail(3)
+
+    lines = ["Agent intake comparison:"]
+    lines.append("Top performers:")
+    for name, value in top.items():
+        lines.append(f"- {name}: {int(value)} intakes")
+    lines.append("Areas to watch:")
+    for name, value in bottom.items():
+        lines.append(f"- {name}: {int(value)} intakes")
+
+    return " \n".join(lines), _role_followups(role)
+
+
+def _respond_agents_below_target(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    if "agent_name" not in frame.columns:
+        return (
+            "Agent information isn't available to assess targets.",
+            _role_followups(role),
+        )
+
+    today = _current_timestamp().replace(day=1)
+    next_month = today + pd.DateOffset(months=1)
+    monthly = _filter_by_date(frame[frame["is_enrolled"]], start=today, end=next_month)
+    if monthly.empty:
+        return (
+            "No enrolments have been recorded this month yet.",
+            _role_followups(role),
+        )
+
+    tally = (
+        monthly.groupby("agent_name")["student_id"].nunique().sort_values()
+    )
+    laggards = tally[tally < MONTHLY_INTAKE_TARGET]
+    if laggards.empty:
+        return (
+            "All agents are on track to hit the monthly intake target of "
+            f"{MONTHLY_INTAKE_TARGET} students.",
+            _role_followups(role),
+        )
+
+    lines = [
+        f"Agents below the monthly target of {MONTHLY_INTAKE_TARGET} enrolments:" 
+    ]
+    for name, value in laggards.items():
+        lines.append(f"- {name}: {int(value)} confirmed intakes")
+
+    return " \n".join(lines), _role_followups(role)
+
+
+def _respond_average_first_response_time(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    return (
+        "The dataset doesn't track inquiry timestamps or response times, so I can't calculate first-response performance.",
+        _role_followups(role),
+    )
+
+
+def _respond_team_task_list(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    return (
+        "Task assignments aren't stored in the admissions dataset. Try the project management workspace for team to-dos.",
+        _role_followups(role),
+    )
+
+
+def _respond_filter_by_country(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    country = match.group("country") if match and "country" in match.groupdict() else ""
+    country = (country or "").strip(" \"'?.")
+    country = re.sub(r"^the\s+", "", country, flags=re.IGNORECASE)
+    if not country:
+        return (
+            "Please specify the country or region you'd like to filter by.",
+            _role_followups(role),
+        )
+
+    if "nationality" not in frame.columns:
+        return (
+            "Nationality data isn't available in the dataset.",
+            _role_followups(role),
+        )
+
+    subset = frame[frame["nationality"].str.contains(country, case=False, na=False) & frame["is_enrolled"]]
+    if subset.empty:
+        return (
+            f"No enrolled students from {country} are in the current dataset.",
+            _role_followups(role),
+        )
+
+    count = int(subset["student_id"].nunique())
+    revenue = float(subset["paid_fees"].sum())
+    response = (
+        f"{count} enrolled students originate from {country}, contributing {_format_currency(revenue)} in paid fees."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_program_choice_semester(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    program = match.group("program") if match and "program" in match.groupdict() else ""
+    program = (program or "").strip(" \"'?.")
+    program = re.sub(r"^the\s+", "", program, flags=re.IGNORECASE)
+    if not program:
+        return (
+            "Please specify the program or course name you want to check.",
+            _role_followups(role),
+        )
+
+    if "course_name" not in frame.columns:
+        return (
+            "Course names are missing from the dataset.",
+            _role_followups(role),
+        )
+
+    if "trimester" in frame.columns and "offer_year" in frame.columns:
+        latest_year = frame["offer_year"].dropna().max()
+        trimmed = frame[frame["offer_year"] == latest_year]
+        if not trimmed.empty:
+            latest_trimester = trimmed["trimester"].dropna().iloc[0]
+        else:
+            latest_trimester = frame["trimester"].dropna().iloc[0] if frame["trimester"].notna().any() else None
+        if latest_trimester is not None:
+            working = frame[(frame["trimester"] == latest_trimester) & (frame["offer_year"] == latest_year)]
+        else:
+            working = frame
+    else:
+        working = frame
+
+    subset = working[working["course_name"].str.contains(program, case=False, na=False) & working["is_enrolled"]]
+    count = int(subset["student_id"].nunique())
+
+    response = (
+        f"{count} students have chosen {program} in the current semester snapshot."
+    )
+
+    return response, _role_followups(role)
+
+
+def _respond_demographic_breakdown_applicants(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    applicants = frame[frame["is_offered"]]
+    if applicants.empty:
+        return (
+            "There are no active applicants to profile right now.",
+            _role_followups(role),
+        )
+
+    lines = []
+    if "age" in applicants.columns and applicants["age"].notna().any():
+        avg_age = applicants["age"].dropna().mean()
+        lines.append(f"Average age: {avg_age:.1f} years")
+
+        age_bins = pd.cut(applicants["age"], bins=[0, 20, 25, 30, 35, 100], include_lowest=True)
+        age_counts = age_bins.value_counts().sort_index()
+        age_summary = ", ".join(f"{interval.left:.0f}-{interval.right:.0f}: {count}" for interval, count in age_counts.items())
+        lines.append(f"Age distribution: {age_summary}")
+
+    if "nationality" in applicants.columns:
+        top_nationalities = (
+            applicants.groupby("nationality")["student_id"].nunique().sort_values(ascending=False).head(3)
+        )
+        nationality_summary = ", ".join(f"{nation} ({count})" for nation, count in top_nationalities.items())
+        lines.append(f"Top nationalities: {nationality_summary}")
+
+    response = "; ".join(lines) if lines else "Applicant demographics aren't available."
+    return response, _role_followups(role)
+
+
+def _respond_contact_details_student(
+    frame: pd.DataFrame,
+    match: re.Match,
+    role: str,
+) -> Tuple[str, List[str]]:
+    student = match.group("student") if match and "student" in match.groupdict() else ""
+    student = (student or "").strip(" \"'?.")
+    student = re.sub(r"\bapplication\b", "", student, flags=re.IGNORECASE).strip()
+    if not student:
+        return (
+            "Please provide the student ID or name you need details for.",
+            _role_followups(role),
+        )
+
+    mask_id = frame["student_id"].str.contains(student, case=False, na=False)
+    name_cols = []
+    if "first_name" in frame.columns:
+        name_cols.append(frame["first_name"].str.contains(student, case=False, na=False))
+    if "last_name" in frame.columns:
+        name_cols.append(frame["last_name"].str.contains(student, case=False, na=False))
+    if name_cols:
+        name_mask = name_cols[0]
+        for extra in name_cols[1:]:
+            name_mask |= extra
+        mask = mask_id | name_mask
+    else:
+        mask = mask_id
+
+    subset = frame[mask]
+    if subset.empty:
+        return (
+            f"I couldn't find a record for '{student}'.",
+            _role_followups(role),
+        )
+
+    row = subset.iloc[0]
+    parts = [f"Student ID: {row.get('student_id', 'N/A')}"]
+    if "first_name" in row and "last_name" in row:
+        parts.append(f"Name: {row.get('first_name', '')} {row.get('last_name', '')}".strip())
+    if "course_name" in row:
+        parts.append(f"Course: {row.get('course_name', 'Unknown')}")
+    if "agent_name" in row:
+        parts.append(f"Agent: {row.get('agent_name', 'Unknown')}")
+    if "campus_name" in row:
+        parts.append(f"Campus: {row.get('campus_name', 'Unknown')}")
+
+    parts.append("Direct contact details aren't stored in this dataset.")
+    response = "; ".join(parts)
+
+    return response, _role_followups(role)
+
+
+AI_CHAT_DATA_HANDLERS: List[Tuple[Pattern[str], Callable[[pd.DataFrame, re.Match, str], Tuple[str, List[str]]]]] = [
+    (re.compile(r"total fee collection.*quarter", re.IGNORECASE), _respond_fee_collection_vs_last_quarter),
+    (re.compile(r"revenue (growth )?trend.*12 month", re.IGNORECASE), _respond_revenue_trend_12_months),
+    (re.compile(r"net profit margin", re.IGNORECASE), _respond_highest_profit_margin),
+    (re.compile(r"cash flow status", re.IGNORECASE), _respond_cash_flow_status),
+    (re.compile(r"budget (utilisation|utilization).*actual spend", re.IGNORECASE), _respond_budget_vs_actual_ytd),
+    (re.compile(r"enrol+ment growth rate.*year", re.IGNORECASE), _respond_enrolment_growth_rate),
+    (re.compile(r"(summary|summarise).*kpi.*last month", re.IGNORECASE), _respond_kpi_summary_last_month),
+    (re.compile(r"key risks.*trending", re.IGNORECASE), _respond_key_risks_trending),
+    (re.compile(r"retention rate.*top.*program", re.IGNORECASE), _respond_retention_rate_top_programs),
+    (re.compile(r"geographic breakdown.*student population", re.IGNORECASE), _respond_geographic_breakdown_students),
+    (re.compile(r"agent group.*highest value of intakes", re.IGNORECASE), _respond_agent_highest_value_intakes),
+    (re.compile(r"average cost per acquisition", re.IGNORECASE), _respond_average_cost_per_acquisition),
+    (re.compile(r"top\s*(3|three)?\s*performing agents.*last quarter", re.IGNORECASE), _respond_top_agents_last_quarter),
+    (re.compile(r"agent turnover rate", re.IGNORECASE), _respond_agent_turnover_trend),
+    (re.compile(r"increase fees by\s*\$?(?P<amount>[0-9,\.]+)", re.IGNORECASE), _respond_fee_increase_projection),
+    (re.compile(r"predicted student intake.*next semester", re.IGNORECASE), _respond_predicted_intake_next_semester),
+    (re.compile(r"year[- ]over[- ]year growth projection", re.IGNORECASE), _respond_yoy_growth_projection),
+    (re.compile(r"new student applications.*week", re.IGNORECASE), _respond_new_applications_this_week),
+    (re.compile(r"conversion rate.*30 days", re.IGNORECASE), _respond_conversion_rate_30_days),
+    (re.compile(r"pending applications.*withdrawn", re.IGNORECASE), _respond_withdrawn_pending_list),
+    (re.compile(r"completed all steps except fee payment|pending fee payment", re.IGNORECASE), _respond_students_pending_payment),
+    (re.compile(r"what is (?P<agent>.+?)'?s total number of successful intakes", re.IGNORECASE), _respond_agent_successful_intakes),
+    (re.compile(r"compare the intake volume between agents", re.IGNORECASE), _respond_compare_intake_volume_agents),
+    (re.compile(r"agents.*below.*monthly intake target", re.IGNORECASE), _respond_agents_below_target),
+    (re.compile(r"average first[- ]response time", re.IGNORECASE), _respond_average_first_response_time),
+    (re.compile(r"task list.*deadlines.*team.*week", re.IGNORECASE), _respond_team_task_list),
+    (re.compile(r"intakes only from (?P<country>[a-zA-Z\s]+)", re.IGNORECASE), _respond_filter_by_country),
+    (re.compile(r"how many students have chosen the (?P<program>.+?) this semester", re.IGNORECASE), _respond_program_choice_semester),
+    (re.compile(r"demographic breakdown.*current applicants", re.IGNORECASE), _respond_demographic_breakdown_applicants),
+    (re.compile(r"contact details.*for (the )?(?P<student>[a-zA-Z0-9\s]+)", re.IGNORECASE), _respond_contact_details_student),
+]
+
+
+def _answer_data_question(text: str, role: str) -> Optional[Tuple[str, List[str]]]:
+    frame = _load_chat_dataframe()
+    if frame.empty:
+        return (
+            "I couldn't load the admissions dataset right now, so I can't calculate that metric.",
+            _role_followups(role),
+        )
+
+    for pattern, handler in AI_CHAT_DATA_HANDLERS:
+        match = pattern.search(text)
+        if match:
+            try:
+                return handler(frame, match, role)
+            except Exception as exc:  # pragma: no cover - defensive logging
+                app.logger.exception("AI data handler failed: %s", exc)
+                return (
+                    "I ran into an issue while analysing the dataset. Please try again in a moment.",
+                    _role_followups(role),
+                )
+    return None
+
+
 def _ai_chat_response(message: str) -> Tuple[str, List[str]]:
     """Return a lightweight assistant reply and follow-up suggestions."""
 
@@ -820,6 +2098,10 @@ def _ai_chat_response(message: str) -> Tuple[str, List[str]]:
     greetings = {"hi", "hello", "hey", "good morning", "good afternoon", "good evening"}
     if lowered in greetings or any(lowered.startswith(greeting) for greeting in greetings):
         return context["greeting"], context["follow_ups"]
+
+    data_answer = _answer_data_question(text, role)
+    if data_answer:
+        return data_answer
 
     best_entry = None
     best_score = 0

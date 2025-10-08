@@ -1469,75 +1469,363 @@ Action: A further 32 offers could add about $355,200 if 60% convert."
 2025-10-04T16:07:14+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
 Context: Sydney Campus is the next preference with 15 prospects.
 Action: Balance marketing and resources across the top campuses."
-2025-10-05T06:37:10+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+2025-10-06T10:39:07+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
 Context: Payment preferences were captured from engaged applicants.
 Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
-2025-10-05T06:37:10+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+2025-10-06T10:39:07+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
 Context: 43 learners are currently engaged across all courses.
 Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
-2025-10-05T06:37:10+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+2025-10-06T10:39:07+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
 Context: 'Career Development' follows with 40 mentions.
 Action: Tailor messaging to emphasise these motivations during counselling."
-2025-10-05T06:37:10+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+2025-10-06T10:39:07+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
 Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
 Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
-2025-10-05T06:37:10+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+2025-10-06T10:39:07+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
 Context: Estimate based on $18,500 per enrolment.
 Action: A further 32 offers could add about $355,200 if 60% convert."
-2025-10-05T06:37:10+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+2025-10-06T10:39:07+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
 Context: Sydney Campus is the next preference with 15 prospects.
 Action: Balance marketing and resources across the top campuses."
-2025-10-05T06:37:10+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+2025-10-06T10:39:07+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
 Context: Payment preferences were captured from engaged applicants.
 Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
-2025-10-05T06:37:10+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+2025-10-06T10:39:07+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
 Context: 43 learners are currently engaged across all courses.
 Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
-2025-10-05T06:37:10+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+2025-10-06T10:39:07+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
 Context: 'Career Development' follows with 40 mentions.
 Action: Tailor messaging to emphasise these motivations during counselling."
-2025-10-05T06:37:10+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+2025-10-06T10:39:07+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
 Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
 Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
-2025-10-05T06:37:10+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+2025-10-06T10:39:07+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
 Context: Estimate based on $18,500 per enrolment.
 Action: A further 32 offers could add about $355,200 if 60% convert."
-2025-10-05T06:37:10+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+2025-10-06T10:39:07+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
 Context: Sydney Campus is the next preference with 15 prospects.
 Action: Balance marketing and resources across the top campuses."
-2025-10-05T06:37:11+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+2025-10-06T10:39:08+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
 Context: Payment preferences were captured from engaged applicants.
 Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
-2025-10-05T06:37:11+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+2025-10-06T10:39:08+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
 Context: 43 learners are currently engaged across all courses.
 Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
-2025-10-05T06:37:11+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+2025-10-06T10:39:08+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
 Context: 'Career Development' follows with 40 mentions.
 Action: Tailor messaging to emphasise these motivations during counselling."
-2025-10-05T06:37:11+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+2025-10-06T10:39:08+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
 Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
 Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
-2025-10-05T06:37:11+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+2025-10-06T10:39:08+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
 Context: Estimate based on $18,500 per enrolment.
 Action: A further 32 offers could add about $355,200 if 60% convert."
-2025-10-05T06:37:11+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+2025-10-06T10:39:08+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
 Context: Sydney Campus is the next preference with 15 prospects.
 Action: Balance marketing and resources across the top campuses."
-2025-10-05T06:37:11+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+2025-10-06T10:39:08+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
 Context: Payment preferences were captured from engaged applicants.
 Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
-2025-10-05T06:37:11+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+2025-10-06T10:39:08+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
 Context: 43 learners are currently engaged across all courses.
 Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
-2025-10-05T06:37:11+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+2025-10-06T10:39:08+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
 Context: 'Career Development' follows with 40 mentions.
 Action: Tailor messaging to emphasise these motivations during counselling."
-2025-10-05T06:37:11+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+2025-10-06T10:39:08+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
 Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
 Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
-2025-10-05T06:37:11+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+2025-10-06T10:39:08+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
 Context: Estimate based on $18,500 per enrolment.
 Action: A further 32 offers could add about $355,200 if 60% convert."
-2025-10-05T06:37:11+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+2025-10-06T10:39:08+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T08:34:15+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T08:34:15+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T08:34:15+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T08:34:15+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T08:34:15+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T08:34:15+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T08:34:15+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T08:34:15+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T08:34:15+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T08:34:15+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T08:34:15+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T08:34:15+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T08:34:16+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T08:34:16+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T08:34:16+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T08:34:16+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T08:34:16+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T08:34:16+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T08:34:16+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T08:34:16+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T08:34:16+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T08:34:16+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T08:34:16+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T08:34:16+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T08:49:15+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T08:49:15+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T08:49:15+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T08:49:15+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T08:49:15+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T08:49:15+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T08:49:16+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T08:49:16+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T08:49:16+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T08:49:16+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T08:49:16+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T08:49:16+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:04:15+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:04:15+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:04:15+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:04:15+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:04:15+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:04:15+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:04:16+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:04:16+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:04:16+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:04:16+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:04:16+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:04:16+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:30:12+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:30:12+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:30:12+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:30:12+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:30:12+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:30:12+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:30:12+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:30:12+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:30:12+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:30:12+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:30:12+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:30:12+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:30:12+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:30:12+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:30:12+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:30:12+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:30:12+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:30:12+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:30:13+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:30:13+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:30:13+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:30:13+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:30:13+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:30:13+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:42:27+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:42:27+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:42:27+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:42:27+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:42:27+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:42:27+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:42:27+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:42:27+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:42:27+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:42:27+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:42:27+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:42:27+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:42:29+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:42:29+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:42:29+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:42:29+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:42:29+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:42:29+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
+Context: Sydney Campus is the next preference with 15 prospects.
+Action: Balance marketing and resources across the top campuses."
+2025-10-08T09:42:29+00:00,manager,due_payments,Due Payments,"Summary: 93 of 100 applicants (93%) prefer to pay less than half upfront.
+Context: Payment preferences were captured from engaged applicants.
+Action: Coordinate follow-ups with Bright Future Consultants, who manages 33 of these cases."
+2025-10-08T09:42:29+00:00,manager,course_performance,Course Performance,"Summary: Bachelor of Nursing leads with 14 active students—2 more than Bachelor of Business.
+Context: 43 learners are currently engaged across all courses.
+Action: Share Bachelor of Nursing's approach to help Bachelor of Business close the gap."
+2025-10-08T09:42:29+00:00,manager,study_reasons,Top Study Reasons,"Summary: 'Job Interest' is the leading motivation with 40 students (40%).
+Context: 'Career Development' follows with 40 mentions.
+Action: Tailor messaging to emphasise these motivations during counselling."
+2025-10-08T09:42:29+00:00,leader,top_agents,Top Performing Agents,"Summary: Global Pathways leads with 14 enrolments (44% conversion), 0 ahead of Bright Future Consultants.
+Context: Bright Future Consultants has 14 confirmed students and can close the gap with targeted support.
+Action: Ask Global Pathways to mentor Bright Future Consultants on high-conversion tactics."
+2025-10-08T09:42:29+00:00,leader,estimated_revenue,Estimated Revenue,"Summary: 43 confirmed students represent about $795,500 in tuition revenue.
+Context: Estimate based on $18,500 per enrolment.
+Action: A further 32 offers could add about $355,200 if 60% convert."
+2025-10-08T09:42:29+00:00,leader,campus_demand,Campus Demand,"Summary: Melbourne City Campus attracts 21 students (49%), leading campus demand.
 Context: Sydney Campus is the next preference with 15 prospects.
 Action: Balance marketing and resources across the top campuses."

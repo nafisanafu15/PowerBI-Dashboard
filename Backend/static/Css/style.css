@@ -508,6 +508,202 @@ body {
   text-transform: uppercase;
 }
 
+.download-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(17, 24, 39, 0.55);
+  padding: 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 1050;
+}
+
+.download-modal.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.download-modal__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.download-modal__dialog {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 420px;
+  width: min(100%, 420px);
+  padding: 2rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  outline: none;
+}
+
+.download-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-modal__close::before,
+.download-modal__close::after {
+  content: "";
+  position: absolute;
+  width: 1.1rem;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 1px;
+  transition: background-color 0.2s ease;
+}
+
+.download-modal__close::before {
+  transform: rotate(45deg);
+}
+
+.download-modal__close::after {
+  transform: rotate(-45deg);
+}
+
+.download-modal__close:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 4px;
+}
+
+.download-modal__close:hover {
+  color: #1f2937;
+}
+
+.download-modal__title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.download-modal__subtitle {
+  color: #475569;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.download-modal__actions {
+  display: grid;
+  gap: 1rem;
+}
+
+.download-modal__option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.download-modal__option:hover:not(:disabled),
+.download-modal__option:focus-visible {
+  transform: translateY(-2px);
+  background: #e0f2fe;
+  box-shadow: 0 14px 30px rgba(14, 116, 144, 0.2);
+  border-color: #38bdf8;
+  outline: none;
+}
+
+.download-modal__option:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.download-modal__option.is-loading::after {
+  content: "";
+  margin-left: auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: 2px solid rgba(14, 116, 144, 0.35);
+  border-top-color: #0ea5e9;
+  animation: download-spinner 0.8s linear infinite;
+}
+
+@keyframes download-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.download-modal__hint {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.download-modal__error {
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+body.is-clipped {
+  overflow: hidden;
+}
+
+.download-capture {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 2rem;
+  width: 1024px;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.download-capture--single {
+  display: block;
+}
+
+.download-capture [data-download-section="storyboards"] {
+  align-self: flex-start;
+}
+
+.download-capture h1,
+.download-capture h2,
+.download-capture h3 {
+  color: #0f172a;
+}
+
+.download-chart-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.75rem;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.4), rgba(148, 163, 184, 0.1));
+  padding: 0.5rem;
+}
+
 @media (min-width: 900px) {
   .storyboard-grid {
     display: grid;
@@ -555,6 +751,9 @@ body {
   border-radius: 12px;
   padding: 2rem 1rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .feature-icon {
@@ -584,6 +783,7 @@ body {
 .kpi-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
 }
 
 @media (min-width: 1200px) {
