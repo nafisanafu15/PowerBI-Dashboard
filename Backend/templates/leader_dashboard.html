@@ -3,8 +3,8 @@
 {% block title %}Leader Dashboard – KPI Overview{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='Css/leader-dashboard.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leader-dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
@@ -13,46 +13,58 @@
 </section>
 
 <section class="dashboard-body">
-  <div class="charts-container">
+  <div class="charts-container" data-download-section="charts">
     <div class="chart-card">
-      <h3>Application Status</h3>
-      <button class="view-report" onclick="location.href='{{ url_for('application_status_report') }}'">View Report</button>
-      <canvas id="applicationStatusChart" width="400" height="200"></canvas>
+      <h3>Revenue Forecast</h3>
+      <button class="view-report" onclick="location.href='{{ url_for('application_status_report') }}'">View
+        Report</button>
+      <canvas id="revenueForecastChart" width="400" height="200"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Deferred Offers Overview</h3>
-      <button class="view-report" onclick="location.href='{{ url_for('deferred_offers_report') }}'">View Report</button>
-      <canvas id="deferredOffersChart" width="400" height="200"></canvas>
+      <h3>Offers Overview</h3>
+      <button class="view-report" onclick="location.href='{{ url_for('offers_report') }}'">View Report</button>
+      <canvas id="offersOverviewChart" width="400" height="200"></canvas>
     </div>
     <div class="chart-card">
       <h3>Agent Performance</h3>
-      <button class="view-report" onclick="location.href='{{ url_for('agent_performance_report') }}'">View Report</button>
+      <button class="view-report" onclick="location.href='{{ url_for('agent_performance_report') }}'">View
+        Report</button>
       <canvas id="agentPerformanceChart" width="400" height="200"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Student Classification</h3>
-      <button class="view-report" onclick="location.href='{{ url_for('student_classification_report') }}'">View Report</button>
+      <h3>Student Classification by Course &amp; Visa</h3>
+      <button class="view-report" onclick="location.href='{{ url_for('student_classification_report') }}'">View
+        Report</button>
       <canvas id="studentClassificationChart" width="400" height="200"></canvas>
     </div>
   </div>
 
-  <aside class="kpi-storyboards">
+  <aside class="kpi-storyboards" data-download-section="storyboards">
     <h2 class="kpi-storyboards__title">Storyboards</h2>
-    <div class="kpi-card blue">
-      <h4>Top Performing Agents</h4>
-    </div>
-    <div class="kpi-card orange">
-      <h4>Enrollment Trend by Intake</h4>
-    </div>
-    <div class="kpi-card green">
-      <h4>Estimated Revenue for Enrollment</h4>
-    </div>
+    <p class="kpi-storyboards__timestamp" id="storyboards-updated"></p>
+    <div class="kpi-storyboards__list" id="leader-storyboard-card-container" role="list" aria-live="polite"></div>
+    <p class="kpi-storyboards__note">Tap a storyboard to explore the full AI insight.</p>
   </aside>
+
+  <div class="storyboard-modal" id="storyboard-modal" aria-hidden="true" data-download-ignore>
+    <div class="storyboard-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="storyboard-modal-title"
+      tabindex="-1">
+      <button type="button" class="storyboard-modal__close" data-modal-dismiss
+        aria-label="Close insight">&times;</button>
+      <div class="storyboard-modal__content">
+        <h3 class="storyboard-modal__title" id="storyboard-modal-title"></h3>
+        <p class="storyboard-modal__timestamp" id="storyboard-modal-timestamp"></p>
+        <p class="storyboard-modal__summary" id="storyboard-modal-summary"></p>
+        <div class="storyboard-modal__details" id="storyboard-modal-details"></div>
+      </div>
+      <p class="storyboard-modal__disclaimer">Insight generated using AI-validate against operational data before making
+        decisions.</p>
+    </div>
+  </div>
 
 </section>
 {% endblock %}
 
 {% block extra_scripts %}
-  <script src="{{ url_for('static', filename='js/leader-dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/leader-dashboard.js') }}"></script>
 {% endblock %}
-

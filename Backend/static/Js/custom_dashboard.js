@@ -30,6 +30,82 @@ const SKIP_FIELDS = new Set(["_rowid_", "rowid", "__rowid__"]);
 let ORIGINAL_LABELS = {};
 const MUTEX_PAIRS = new Map();
 
+/* -------------------- Utility -------------------- */
+function hasRenderedCharts(){
+  return Array.from(document.querySelectorAll('.chart-card canvas')).some(canvas => Boolean(canvas._chart));
+}
+
+function renderStoryToImage(storyText){
+  if (!storyText) return null;
+
+  const lines = storyText.split(/\r?\n/);
+  const tmpCanvas = document.createElement('canvas');
+  const tmpCtx = tmpCanvas.getContext('2d');
+  const fontSize = 16;
+  const fontStack = "Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
+
+  tmpCtx.font = `${fontSize}px ${fontStack}`;
+  let maxWidth = 0;
+  for (const line of lines){
+    const metrics = tmpCtx.measureText(line);
+    maxWidth = Math.max(maxWidth, metrics.width);
+  }
+
+  const paddingX = 24;
+  const paddingY = 24;
+  const width = Math.min(1000, Math.max(320, Math.ceil(maxWidth + paddingX * 2)));
+  const lineHeight = Math.ceil(fontSize * 1.6);
+  const height = Math.ceil(lines.length * lineHeight + paddingY * 2);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#0f172a';
+  ctx.font = `${fontSize}px ${fontStack}`;
+  ctx.textBaseline = 'top';
+
+  let y = paddingY;
+  for (const line of lines){
+    ctx.fillText(line, paddingX, y);
+    y += lineHeight;
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+function collectChartSnapshots(){
+  const cards = Array.from(document.querySelectorAll('.chart-card'));
+  const snapshots = [];
+
+  cards.forEach((card, idx) => {
+    const canvas = card.querySelector('canvas');
+    if (!canvas || !canvas._chart) return;
+
+    const xField = card.querySelector('.x-field')?.value || '';
+    const yField = card.querySelector('.y-field')?.value || '';
+    const chartType = card.querySelector('.chart-type')?.value || canvas._chart?.config?.type || 'chart';
+
+    const title = `${metricLabelFromKey(yField)} by ${FIELD_RULES_BY_KEY[xField]?.label || xField}`.trim();
+    const chartImage = canvas.toDataURL('image/png');
+    const storyText = card.querySelector('.chart-story .ga-body')?.textContent?.trim() || '';
+    const storyImage = renderStoryToImage(storyText);
+
+    snapshots.push({
+      index: idx,
+      type: chartType,
+      title,
+      chartImage,
+      storyImage,
+      storyText
+    });
+  });
+
+  return snapshots;
+}
+
 /* -------------------- Header normalization -------------------- */
 const HEADER_MAP = {
   "StudentId":"studentid",
@@ -938,7 +1014,24 @@ function addChartCard(){
 async function init(){
   try{
     const res = await fetch("/api/data");
-    const raw = await res.json();
+    const payload = await res.json().catch(() => null);
+
+    if (!res.ok || !payload) {
+      const message = (payload && payload.error)
+        ? payload.error
+        : `Failed to load data (${res.status || 'network error'})`;
+      throw new Error(message);
+    }
+
+    if (!Array.isArray(payload)) {
+      throw new Error(payload?.error || "Unexpected data format returned by the server.");
+    }
+
+    if (!payload.length) {
+      throw new Error("No data is available for the dashboard.");
+    }
+
+    const raw = payload;
 
     ORIGINAL_LABELS = {};
     if (Array.isArray(raw) && raw.length){
@@ -974,9 +1067,131 @@ async function init(){
       alert("Dashboard configuration saved to console.");
     });
 
+    const shareButton = document.getElementById("shareDashboard");
+    const shareModalEl = document.getElementById("shareModal");
+    const shareForm = document.getElementById("shareForm");
+    const shareFeedback = document.getElementById("shareFeedback");
+    const shareSubmit = document.getElementById("shareSubmit");
+    const shareSubmitDefault = shareSubmit ? shareSubmit.textContent : "";
+    const modalInstance = (shareModalEl && window.bootstrap?.Modal)
+      ? new window.bootstrap.Modal(shareModalEl)
+      : null;
+
+    const resetShareFeedback = () => {
+      if (!shareFeedback) return;
+      shareFeedback.classList.add("d-none");
+      shareFeedback.classList.remove("alert-success", "alert-danger", "alert-warning", "alert-info");
+      shareFeedback.textContent = "";
+    };
+
+    const showShareFeedback = (message, variant = "success") => {
+      if (!shareFeedback) {
+        alert(message);
+        return;
+      }
+      shareFeedback.classList.remove("d-none", "alert-success", "alert-danger", "alert-warning", "alert-info");
+      shareFeedback.classList.add(`alert-${variant}`);
+      shareFeedback.textContent = message;
+    };
+
+    const setShareSubmitLoading = (isLoading) => {
+      if (!shareSubmit) return;
+      if (isLoading) {
+        shareSubmit.disabled = true;
+        shareSubmit.textContent = "Saving...";
+      } else {
+        shareSubmit.disabled = false;
+        shareSubmit.textContent = shareSubmitDefault;
+      }
+    };
+
+    shareModalEl?.addEventListener("hidden.bs.modal", () => {
+      shareForm?.reset();
+      resetShareFeedback();
+      setShareSubmitLoading(false);
+    });
+
+    shareButton?.addEventListener("click", () => {
+      resetShareFeedback();
+      if (!hasRenderedCharts()) {
+        const message = "Please generate at least one chart before sharing.";
+        showShareFeedback(message, "danger");
+        alert(message);
+        return;
+      }
+      shareForm?.reset();
+      setShareSubmitLoading(false);
+      modalInstance?.show();
+    });
+
+    shareForm?.addEventListener("submit", async (evt) => {
+      evt.preventDefault();
+      resetShareFeedback();
+
+      if (!hasRenderedCharts()) {
+        showShareFeedback("Generate a chart to capture and share first.", "danger");
+        return;
+      }
+
+      const snapshots = collectChartSnapshots();
+      if (!snapshots.length) {
+        showShareFeedback("No chart snapshots were available to share.", "danger");
+        return;
+      }
+
+      const formData = new FormData(shareForm);
+      const payload = {
+        recipientEmail: (formData.get("recipient") || "").toString().trim(),
+        subject: (formData.get("subject") || "").toString().trim(),
+        message: (formData.get("message") || "").toString().trim(),
+        charts: snapshots
+      };
+
+      if (!payload.recipientEmail) {
+        showShareFeedback("Please provide a recipient email.", "danger");
+        return;
+      }
+
+      setShareSubmitLoading(true);
+
+      try {
+        const res = await fetch("/api/share-dashboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          showShareFeedback(data?.message || "Share saved! We stored the chart snapshots for delivery.", "success");
+          shareForm.reset();
+        } else {
+          showShareFeedback(data?.error || "Unable to save share request.", "danger");
+        }
+      } catch (err) {
+        console.error("Failed to share dashboard", err);
+        showShareFeedback("A network error prevented saving the share request.", "danger");
+      } finally {
+        setShareSubmitLoading(false);
+      }
+    });
+
     addChartCard(); // first card
   } catch (e){
     console.error("Failed to load data", e);
+    const container = document.getElementById("charts");
+    if (container){
+      container.innerHTML = "";
+      const alert = document.createElement("div");
+      alert.className = "alert alert-danger";
+      alert.setAttribute("role", "alert");
+      alert.textContent = e?.message || "Unable to load dashboard data.";
+      container.appendChild(alert);
+    }
+    ["addChart","saveDashboard","resetDashboard","shareDashboard"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.disabled = true;
+    });
   }
 }
 

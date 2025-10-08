@@ -11,192 +11,656 @@ function pick(o, ...names) {
 }
 
 const palette = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
+const STATUS_COLOR_RAMP = [
+  "#2563eb",
+  "#22c55e",
+  "#f97316",
+  "#ec4899",
+  "#facc15",
+  "#0ea5e9",
+  "#a855f7",
+];
+const VISA_COLOR_RAMP = [
+  "#0ea5e9",
+  "#10b981",
+  "#f97316",
+  "#6366f1",
+  "#facc15",
+  "#ef4444",
+  "#14b8a6",
+];
+const STORYBOARD_FALLBACK = "AI insight is not available right now.";
+const STORYBOARD_THEMES = ["blue", "orange", "green", "purple", "teal", "slate"];
+
+function toNumber(value) {
+  if (value == null || value === "") return 0;
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const cleaned = value.replace(/[$,]/g, "");
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+function parseDateLike(value) {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const primary = new Date(trimmed);
+  if (!Number.isNaN(primary.getTime())) return primary;
+  const fallback = new Date(trimmed.replace(/-/g, "/"));
+  if (!Number.isNaN(fallback.getTime())) return fallback;
+  return null;
+}
+
+function startOfMonth(date) {
+  const d = new Date(date.getTime());
+  d.setDate(1);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function buildMonthSeries(count) {
+  const base = new Date();
+  const first = startOfMonth(base);
+  const months = [];
+  for (let i = 0; i < count; i += 1) {
+    const d = new Date(first.getTime());
+    d.setMonth(first.getMonth() + i);
+    months.push(d);
+  }
+  return months;
+}
+
+function deriveForecastMonths(rows, count = 12) {
+  if (!Array.isArray(rows) || !rows.length) {
+    return buildMonthSeries(count);
+  }
+
+  const parsedMonths = rows
+    .map((row) => {
+      const rawMonth =
+        pick(row, "forecast_month", "forecastMonth", "Forecast_Month") ||
+        pick(row, "start_date", "Start_Date", "StartDate");
+      const parsed = parseDateLike(rawMonth);
+      return parsed ? startOfMonth(parsed) : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  if (!parsedMonths.length) {
+    return buildMonthSeries(count);
+  }
+
+  const earliest = parsedMonths[0];
+  const latest = parsedMonths[parsedMonths.length - 1];
+  const latestWindowStart = startOfMonth(new Date(latest.getTime()));
+  latestWindowStart.setMonth(latestWindowStart.getMonth() - (count - 1));
+
+  const start =
+    latestWindowStart.getTime() > earliest.getTime()
+      ? latestWindowStart
+      : startOfMonth(new Date(earliest.getTime()));
+
+  const months = [];
+  for (let i = 0; i < count; i += 1) {
+    const d = new Date(start.getTime());
+    d.setMonth(start.getMonth() + i);
+    months.push(d);
+  }
+  return months;
+}
+
+function monthKey(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function monthLabel(date) {
+  return date.toLocaleString(undefined, { month: "short", year: "numeric" });
+}
+
+function statusRank(status) {
+  const order = [
+    "Enrolled",
+    "Current Student",
+    "Offered",
+    "New Application Request",
+    "Withdrawn",
+  ];
+  const index = order.findIndex((item) => item.toLowerCase() === String(status || "").toLowerCase());
+  return index === -1 ? order.length : index;
+}
+
+const storyboardUI = (() => {
+  let lastUpdatedText = "";
+  let modalElements = null;
+
+  function ensureModal() {
+    if (modalElements) return modalElements;
+    const modal = document.getElementById("storyboard-modal");
+    if (!modal) return null;
+    const dialog = modal.querySelector(".storyboard-modal__dialog");
+    const titleEl = document.getElementById("storyboard-modal-title");
+    const summaryEl = document.getElementById("storyboard-modal-summary");
+    const detailsEl = document.getElementById("storyboard-modal-details");
+    const timestampEl = document.getElementById("storyboard-modal-timestamp");
+
+    modal.querySelectorAll("[data-modal-dismiss]").forEach((el) => {
+      el.addEventListener("click", closeModal);
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal.classList.contains("is-active")) {
+        closeModal();
+      }
+    });
+
+    modalElements = { modal, dialog, titleEl, summaryEl, detailsEl, timestampEl };
+    return modalElements;
+  }
+
+  function closeModal() {
+    const els = ensureModal();
+    if (!els) return;
+    els.modal.classList.remove("is-active");
+    els.modal.setAttribute("aria-hidden", "true");
+  }
+
+  function renderDetails(container, detailsText, summaryText) {
+    if (!container) return;
+    container.innerHTML = "";
+    const lines = String(detailsText || "").split(/\n+/).map((line) => line.trim()).filter(Boolean);
+    const filtered = summaryText ? lines.filter((line) => line !== summaryText.trim()) : lines;
+    if (!filtered.length) return;
+    filtered.forEach((line) => {
+      const p = document.createElement("p");
+      p.textContent = line;
+      container.appendChild(p);
+    });
+  }
+
+  function openModal({ title, summary, details, timestamp }) {
+    const els = ensureModal();
+    if (!els) return;
+    els.titleEl.textContent = title || "AI Insight";
+    els.summaryEl.textContent = summary || STORYBOARD_FALLBACK;
+    renderDetails(els.detailsEl, details, summary);
+    els.timestampEl.textContent = timestamp || lastUpdatedText || "";
+    els.modal.classList.add("is-active");
+    els.modal.setAttribute("aria-hidden", "false");
+    if (els.dialog) {
+      requestAnimationFrame(() => {
+        els.dialog.focus({ preventScroll: true });
+      });
+    }
+  }
+
+  function splitStory(rawText) {
+    const text = String(rawText || "").trim();
+    if (!text) {
+      return { summary: STORYBOARD_FALLBACK, details: STORYBOARD_FALLBACK };
+    }
+    const parts = text.split(/\n+/).map((part) => part.trim()).filter(Boolean);
+    const summaryLine = parts.shift() || STORYBOARD_FALLBACK;
+    const cleanedSummary = summaryLine.replace(/^Summary:\s*/i, "").trim() || summaryLine;
+    const detailLines = parts.map((part) => part.replace(/^\s+/g, "").replace(/\s+/g, " "));
+    const detailsText = detailLines.length ? detailLines.join("\n") : cleanedSummary;
+    return { summary: cleanedSummary, details: detailsText };
+  }
+
+  function bindCard(summaryEl, storyText) {
+    if (!summaryEl) return;
+    const card =
+      summaryEl.closest(".storyboard-card, .kpi-card, [data-story-trigger]");
+    const { summary, details } = splitStory(storyText);
+    summaryEl.textContent = summary;
+    if (!card) return;
+    card.dataset.storySummary = summary;
+    card.dataset.storyDetails = details;
+    card.dataset.storyTimestamp = lastUpdatedText;
+    if (!card.dataset.storyTitle) {
+      const titleEl = card.querySelector(
+        ".storyboard-card__title, h4, [data-story-title-text]"
+      );
+      const textContent = titleEl ? titleEl.textContent.trim() : "";
+      if (textContent) card.dataset.storyTitle = textContent;
+    }
+
+    if (!card.hasAttribute("tabindex")) {
+      card.tabIndex = 0;
+    }
+    card.setAttribute("role", card.getAttribute("role") || "button");
+
+    if (card.dataset.modalBound !== "true") {
+      const open = () => {
+        openModal({
+          title: card.dataset.storyTitle,
+          summary: card.dataset.storySummary,
+          details: card.dataset.storyDetails,
+          timestamp: card.dataset.storyTimestamp,
+        });
+      };
+
+      card.addEventListener("click", open);
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open();
+        }
+      });
+      card.dataset.modalBound = "true";
+    }
+  }
+
+  return {
+    setLastUpdated(text) {
+      lastUpdatedText = text || "";
+    },
+    applyStory(summaryEl, storyText) {
+      bindCard(summaryEl, storyText);
+    },
+    applyFallback(summaryEl) {
+      bindCard(summaryEl, STORYBOARD_FALLBACK);
+    },
+  };
+})();
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadApplicationStatus();
-  loadDeferredOffers();     // fixed here
+  loadRevenueForecast();
+  loadOffersOverview();
   loadAgentPerformance();
   loadStudentClassification();
+  loadStoryboards('leader', 'leader-storyboard-card-container', 'storyboards-updated');
 });
 
-/* ------------------------------ Application Status ------------------------------ */
-async function loadApplicationStatus() {
-  try {
-    const rows = await fetchJSON("/api/application-status");
-    const labels = rows.map(r => pick(r, "status", "Status"));
-    const data   = rows.map(r => Number(pick(r, "total", "Total")) || 0);
-    new Chart(document.getElementById("applicationStatusChart"), {
-      type: "bar",
-      data: { labels, datasets: [{ label: "Applications", backgroundColor: palette.slice(0, labels.length), data }] },
-      options: { responsive: true }
-    });
-  } catch (e) { console.error("application status", e); }
-}
-
-/* ------------------------------ Deferred Offers (frontend-only) ------------------------------ */
-async function loadDeferredOffers() {
-  const el = document.getElementById("deferredOffersChart");
+/* ------------------------------ Revenue Forecast ------------------------------ */
+async function loadRevenueForecast() {
+  const el = document.getElementById("revenueForecastChart");
   if (!el) return;
 
-  // Try these endpoints in order (no app.py edits needed)
+  try {
+    const rows = await fetchJSON("/api/revenue-forecast");
+    const months = deriveForecastMonths(rows, 12);
+    const monthMap = new Map(months.map((date, idx) => [monthKey(date), idx]));
+    const projectedTotals = months.map(() => 0);
+    const paidTotals = months.map(() => 0);
+
+    rows.forEach((row) => {
+      const monthString =
+        pick(row, "forecast_month", "forecastMonth", "Forecast_Month") ||
+        pick(row, "start_date", "Start_Date", "StartDate");
+      const parsed = parseDateLike(monthString);
+      if (!parsed) return;
+      const key = monthKey(startOfMonth(parsed));
+      if (!monthMap.has(key)) return;
+      const idx = monthMap.get(key);
+      const projected = toNumber(
+        pick(row, "enrolment_fees", "Enrolment_Fees", "revenue")
+      );
+      const paid = toNumber(pick(row, "paid_fees", "Paid_Fees", "paidFees"));
+      projectedTotals[idx] += projected;
+      paidTotals[idx] += paid;
+    });
+
+    const labels = months.map(monthLabel);
+    const projectedColor = "#2563eb";
+    const paidColor = "#16a34a";
+
+    if (el.__chart) el.__chart.destroy();
+    el.__chart = new Chart(el, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Projected Enrolment Fees",
+            data: projectedTotals,
+            borderColor: projectedColor,
+            backgroundColor: "rgba(37, 99, 235, 0.15)",
+            fill: true,
+            tension: 0.25,
+          },
+          {
+            label: "Paid Fees",
+            data: paidTotals,
+            borderColor: paidColor,
+            backgroundColor: "rgba(22, 163, 74, 0.15)",
+            fill: true,
+            tension: 0.25,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const value = ctx.parsed.y || 0;
+                return ` ${ctx.dataset.label}: $${value.toLocaleString()}`;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback(value) {
+                return `$${Number(value).toLocaleString()}`;
+              },
+            },
+          },
+        },
+      },
+    });
+  } catch (e) {
+    console.error("revenue forecast", e);
+  }
+}
+
+/* ------------------------------ Offers Overview ------------------------------ */
+async function loadOffersOverview() {
+  const el = document.getElementById("offersOverviewChart");
+  if (!el) return;
+
   const endpoints = [
-    "/api/deferred-offers",            // most likely to exist
-    "/api/deferred-offers-overview",
-    // optional raw rows endpoints if you have any:
-    "/api/reportdata",
-    "/api/applications",
-    "/api/all"
+    "/api/offers-status",
+    "/api/application-status",
   ];
 
-  // first endpoint that returns JSON without throwing
-  let rows = null;
+  let rows = [];
   for (const url of endpoints) {
-    try { rows = await fetchJSON(url); break; } catch { /* keep trying */ }
-  }
-
-  const normalized = normalizeDeferred(rows || []);
-  renderDeferred(el, normalized);
-}
-
-/** Accepts aggregated or raw rows and outputs:
- *   [{ term: "T1 2025", deferred: n, total: m }, ...]
- */
-function normalizeDeferred(rows) {
-  if (!Array.isArray(rows) || rows.length === 0) return [];
-
-  // aggregated?
-  const agg = r =>
-    ("term" in r || "Term" in r) &&
-    (("deferred" in r) || ("deferred_count" in r) || ("Deferred Count" in r) || ("Deferred_Count" in r)) &&
-    (("total" in r) || ("total_offers" in r) || ("Total Offers" in r) || ("Total_Offers" in r));
-
-  if (agg(rows[0])) {
-    return rows.map(r => ({
-      term: String(pick(r, "term", "Term")),
-      deferred: Number(pick(r, "deferred", "deferred_count", "Deferred Count", "Deferred_Count")) || 0,
-      total:    Number(pick(r, "total", "total_offers", "Total Offers", "Total_Offers")) || 0
-    })).filter(x => x.term && !/^unknown$/i.test(x.term));
-  }
-
-  // raw -> aggregate on the client. Works with your Excel columns.
-  const getTerm = r => {
-    const intake = pick(r, "Previous Offer Intake", "previous_offer_intake", "Offer Intake", "offer_intake", "Intake");
-    const year   = pick(r, "Previous Offer Year", "previous_offer_year", "Offer Year", "offer_year", "Year");
-    if (intake && year != null) return `${intake} ${year}`;
-    if (intake) return String(intake);
-    if (year != null) return String(year);
-    return "Unknown";
-  };
-
-  const byTerm = new Map();
-  for (const r of rows) {
-    const term = getTerm(r);
-    const status = String(pick(r, "Status", "status", "Offer Status", "offer_status") || "").toLowerCase();
-    const rec = byTerm.get(term) || { deferred: 0, total: 0 };
-    rec.total += 1;
-    if (status.startsWith("deferred")) rec.deferred += 1;
-    byTerm.set(term, rec);
-  }
-
-  const out = [];
-  byTerm.forEach((v, k) => { if (!/^unknown$/i.test(k)) out.push({ term: k, deferred: v.deferred, total: v.total }); });
-  return out;
-}
-
-function renderDeferred(el, data) {
-  // Sort terms like T1/T2/T3 by year if present
-  const order = { t1: 1, t2: 2, t3: 3, s1: 1, s2: 2, s3: 3, trimester1:1, trimester2:2, trimester3:3 };
-  const parseKey = s => {
-    const t = String(s);
-    const m = t.match(/(t|s)\s*([123])\s*(\d{4})/i) || t.match(/trimester\s*([123])\s*(\d{4})/i);
-    if (m && m.length >= 3) {
-      let y, k;
-      if (/^(t|s)$/i.test(m[1])) { k = (m[1] + m[2]).toLowerCase(); y = Number(m[3]); }
-      else { k = "trimester" + m[1]; y = Number(m[2]); }
-      return { y, ord: order[k] || 99 };
+    try {
+      rows = normalizeOffers(await fetchJSON(url));
+      if (rows.length) break;
+    } catch (_) {
+      // keep trying other endpoints
     }
-    const m2 = t.match(/(\d{4})/);
-    return { y: m2 ? Number(m2[1]) : 0, ord: 99 };
-  };
-
-  // Merge duplicate terms, compute nonDeferred
-  const byTerm = new Map();
-  for (const r of data) {
-    const term = String(r.term);
-    const cur = byTerm.get(term) || { deferred: 0, total: 0 };
-    cur.deferred += Number(r.deferred ?? 0);
-    cur.total    += Number(r.total ?? 0);
-    byTerm.set(term, cur);
   }
 
-  const labels = [...byTerm.keys()].sort((a,b) => {
-    const A = parseKey(a), B = parseKey(b);
-    return A.y !== B.y ? A.y - B.y : A.ord - B.ord || a.localeCompare(b);
-  });
+  if (!rows.length) return;
 
-  const deferred = labels.map(l => byTerm.get(l).deferred);
-  const nonDeferred = labels.map(l => Math.max(byTerm.get(l).total - byTerm.get(l).deferred, 0));
+  const labels = rows.map(r => r.status);
+  const data = rows.map(r => r.student_count);
+  const paletteLocal = ["#2563eb", "#f97316", "#10b981", "#ef4444", "#8b5cf6", "#14b8a6", "#f59e0b", "#3b82f6", "#ec4899", "#22d3ee"];
 
-  if (el._chart) el._chart.destroy();
-  el._chart = new Chart(el, {
+  if (el.__chart) el.__chart.destroy();
+  el.__chart = new Chart(el, {
     type: "bar",
     data: {
       labels,
-      datasets: [
-        { label: "Deferred",     backgroundColor: palette[0], data: deferred,    stack: "stack1" },
-        { label: "Other Offers", backgroundColor: palette[1], data: nonDeferred, stack: "stack1" }
-      ]
+      datasets: [{
+        label: "Student Count",
+        backgroundColor: labels.map((_, idx) => paletteLocal[idx % paletteLocal.length]),
+        data,
+      }],
     },
     options: {
       responsive: true,
-      plugins: { legend: { position: "bottom" } },
-      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
-    }
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    },
   });
+}
+
+function normalizeOffers(rows) {
+  if (!Array.isArray(rows) || !rows.length) return [];
+  const first = rows[0] ?? {};
+  const hasStatus = "status" in first || "Status" in first || "offer_status" in first || "Offer Status" in first;
+  const hasCount = "student_count" in first || "Student Count" in first || "total" in first || "Total" in first || "count" in first || "Count" in first;
+
+  const tidy = list => list
+    .map(item => ({
+      status: String(pick(item, "status", "Status", "offer_status", "Offer Status") || "").trim(),
+      student_count: Number(pick(item, "student_count", "Student Count", "total", "Total", "count", "Count") || 0),
+    }))
+    .filter(row => row.status && !/^unknown$/i.test(row.status))
+    .sort((a, b) => b.student_count - a.student_count || a.status.localeCompare(b.status));
+
+  if (hasStatus && hasCount) {
+    return tidy(rows);
+  }
+
+  if (!hasStatus) return [];
+
+  const counts = new Map();
+  for (const row of rows) {
+    const status = String(pick(row, "status", "Status", "offer_status", "Offer Status", "Application Status", "application_status") || "").trim();
+    if (!status) continue;
+    const key = status || "Unknown";
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  return tidy(Array.from(counts, ([status, count]) => ({ status, student_count: count })));
 }
 
 /* ------------------------------ Agent Performance ------------------------------ */
 async function loadAgentPerformance() {
+  const el = document.getElementById("agentPerformanceChart");
+  if (!el) return;
+
   try {
     const rows = await fetchJSON("/api/agent-performance");
-    const labels = rows.map(r => pick(r, "agent", "Agent"));
-    const apps   = rows.map(r => Number(pick(r, "applications", "Applications")) || 0);
-    const offers = rows.map(r => Number(pick(r, "offers", "Offers")) || 0);
-    const enrolled = rows.map(r => Number(pick(r, "enrolled", "Enrolled")) || 0);
-    new Chart(document.getElementById("agentPerformanceChart"), {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          { label: "Applications", backgroundColor: palette[0], data: apps },
-          { label: "Offers",       backgroundColor: palette[1], data: offers },
-          { label: "Enrolled",     backgroundColor: palette[2], data: enrolled }
-        ]
-      },
-      options: { responsive: true, plugins: { legend: { position: "top" } } }
+    if (!Array.isArray(rows) || !rows.length) return;
+
+    const agentMap = new Map();
+    const statusSet = new Set();
+
+    rows.forEach((row, idx) => {
+      const agent = (pick(row, "agent", "Agent") || "Unassigned").toString().trim() || "Unassigned";
+      const status = (pick(row, "status", "Status") || "Unknown").toString().trim() || "Unknown";
+      const offerId =
+        pick(row, "offer_id", "Offer_Id", "Offer ID", "OfferId", "offerId") ||
+        pick(row, "student_id", "Student_Id", "Student ID") ||
+        `offer-${idx}`;
+
+      statusSet.add(status);
+      if (!agentMap.has(agent)) agentMap.set(agent, new Map());
+      const statusMap = agentMap.get(agent);
+      if (!statusMap.has(status)) statusMap.set(status, new Set());
+      statusMap.get(status).add(String(offerId));
     });
-  } catch (e) { console.error("agent performance", e); }
+
+    if (!agentMap.size) return;
+
+    const statuses = Array.from(statusSet);
+    statuses.sort((a, b) => statusRank(a) - statusRank(b) || a.localeCompare(b));
+
+    const agentStats = Array.from(agentMap.entries()).map(([agent, statusMap]) => {
+      const counts = {};
+      let total = 0;
+      statuses.forEach((status) => {
+        const set = statusMap.get(status);
+        const count = set ? set.size : 0;
+        counts[status] = count;
+        total += count;
+      });
+      return { agent, counts, total };
+    });
+
+    agentStats.sort((a, b) => b.total - a.total || a.agent.localeCompare(b.agent));
+
+    const labels = agentStats.map((stat) => stat.agent);
+    const datasets = statuses.map((status, idx) => ({
+      label: status,
+      data: agentStats.map((stat) => stat.counts[status] || 0),
+      backgroundColor: STATUS_COLOR_RAMP[idx % STATUS_COLOR_RAMP.length],
+      stack: "status",
+    }));
+
+    if (el.__chart) el.__chart.destroy();
+    el.__chart = new Chart(el, {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+        scales: {
+          x: { stacked: true },
+          y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    });
+  } catch (e) {
+    console.error("agent performance", e);
+  }
 }
 
 /* ------------------------------ Student Classification ------------------------------ */
 async function loadStudentClassification() {
+  const el = document.getElementById("studentClassificationChart");
+  if (!el) return;
+
   try {
     const rows = await fetchJSON("/api/student-classification");
-    const labels = rows.map(r => pick(r, "classification", "Classification"));
-    const data   = rows.map(r => Number(pick(r, "total", "Total")) || 0);
-    new Chart(document.getElementById("studentClassificationChart"), {
-      type: "doughnut",
-      data: {
-        labels,
-        datasets: [{
-          backgroundColor: palette.slice(0, labels.length),
-          borderColor: "#F4F1DE",
-          borderWidth: 2,
-          hoverOffset: 8,
-          data
-        }]
-      },
-      options: { responsive: true }
+    if (!Array.isArray(rows) || !rows.length) return;
+
+    const courseMap = new Map();
+    const visaSet = new Set();
+
+    rows.forEach((row, idx) => {
+      const course = (pick(row, "course_type", "Course_Type", "Course Type", "coursetype") || "Unknown").toString().trim() || "Unknown";
+      const visa = (pick(row, "visa_status", "Visa_Status", "Visa Status", "visa_type", "Visa Type") || "Unknown").toString().trim() || "Unknown";
+      const studentId = (pick(row, "student_id", "Student_Id", "Student ID") || `student-${idx}`).toString();
+
+      visaSet.add(visa);
+      if (!courseMap.has(course)) courseMap.set(course, new Map());
+      const visaMap = courseMap.get(course);
+      if (!visaMap.has(visa)) visaMap.set(visa, new Set());
+      visaMap.get(visa).add(studentId);
     });
-  } catch (e) { console.error("student classification", e); }
+
+    if (!courseMap.size) return;
+
+    const visas = Array.from(visaSet).sort((a, b) => a.localeCompare(b));
+    const courses = Array.from(courseMap.keys()).sort((a, b) => a.localeCompare(b));
+
+    const datasets = visas.map((visa, idx) => ({
+      label: visa,
+      data: courses.map((course) => {
+        const set = courseMap.get(course).get(visa);
+        return set ? set.size : 0;
+      }),
+      backgroundColor: VISA_COLOR_RAMP[idx % VISA_COLOR_RAMP.length],
+      stack: "visa",
+    }));
+
+    if (el.__chart) el.__chart.destroy();
+    el.__chart = new Chart(el, {
+      type: "bar",
+      data: { labels: courses, datasets },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+        scales: {
+          x: { stacked: true },
+          y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    });
+  } catch (e) {
+    console.error("student classification", e);
+  }
+}
+
+/* ------------------------------ AI Storyboards ------------------------------ */
+function resolveTheme(story, index) {
+  const desired = (story && typeof story.theme === "string") ? story.theme.trim() : "";
+  if (desired && STORYBOARD_THEMES.includes(desired)) {
+    return desired;
+  }
+  return STORYBOARD_THEMES[index % STORYBOARD_THEMES.length];
+}
+
+function renderStoryboardCards(containerId, stories) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = "";
+  const list = Array.isArray(stories) ? stories : [];
+
+  if (!list.length) {
+    const card = document.createElement("div");
+    card.classList.add("kpi-card", STORYBOARD_THEMES[0]);
+    card.setAttribute("data-story-trigger", "");
+    const titleEl = document.createElement("h4");
+    titleEl.textContent = "AI Insight";
+    const summaryEl = document.createElement("p");
+    card.append(titleEl, summaryEl);
+    container.appendChild(card);
+    storyboardUI.applyFallback(summaryEl);
+    return;
+  }
+
+  list.forEach((story, index) => {
+    const card = document.createElement("div");
+    card.classList.add("kpi-card", resolveTheme(story, index));
+    card.setAttribute("data-story-trigger", "");
+    card.dataset.storyKey = story?.key || `story-${index}`;
+    const titleText = story?.title || "AI Insight";
+    card.dataset.storyTitle = titleText;
+
+    const titleEl = document.createElement("h4");
+    titleEl.textContent = titleText;
+    const summaryEl = document.createElement("p");
+    summaryEl.id = `story-${story?.key || index}`;
+
+    card.append(titleEl, summaryEl);
+    container.appendChild(card);
+
+    storyboardUI.applyStory(summaryEl, story?.text || STORYBOARD_FALLBACK);
+  });
+}
+
+async function loadStoryboards(role, containerId, timestampId) {
+  try {
+    const response = await fetch(`/api/storyboards/${role}`, { credentials: "same-origin" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    const stories = Array.isArray(payload.stories) ? payload.stories : [];
+
+    let formattedTimestamp = "";
+    if (payload.updated_at) {
+      const parsed = new Date(payload.updated_at);
+      formattedTimestamp = Number.isNaN(parsed.getTime())
+        ? `Updated ${payload.updated_at}`
+        : `Updated ${parsed.toLocaleString()}`;
+    }
+
+    if (!formattedTimestamp) {
+      formattedTimestamp = "Updated just now";
+    }
+
+    if (timestampId) {
+      const tsEl = document.getElementById(timestampId);
+      if (tsEl) {
+        tsEl.textContent = formattedTimestamp;
+      }
+    }
+
+    storyboardUI.setLastUpdated(formattedTimestamp);
+
+    renderStoryboardCards(containerId, stories);
+  } catch (error) {
+    console.error("storyboards (leader)", error);
+    storyboardUI.setLastUpdated("Updated: unavailable");
+    renderStoryboardCards(containerId, []);
+    if (timestampId) {
+      const tsEl = document.getElementById(timestampId);
+      if (tsEl) tsEl.textContent = "Updated: unavailable";
+    }
+  }
 }

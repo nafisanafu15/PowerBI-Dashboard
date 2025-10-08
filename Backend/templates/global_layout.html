@@ -2,13 +2,15 @@
 {% block head %}
   <title>{% block title %}JTrack{% endblock %}</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
     <!-- Chart.js + Luxon Adapter -->
     <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='Css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='Css/report.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
 
   {% block extra_head %}{% endblock %}
 {% endblock %}
@@ -31,10 +33,7 @@
         </a>
       </li>
       <li class="nav-item {{ 'active' if request.endpoint == 'download_data' else '' }}">
-        <a class="nav-link" href="#" title="Download Data"><i class="fa-solid fa-download"></i></a>
-      </li>
-      <li class="nav-item {{ 'active' if request.endpoint == 'settings' else '' }}">
-        <a class="nav-link" href="#" title="Settings"><i class="fa-solid fa-gear"></i></a>
+        <a class="nav-link" href="#" title="Download Data" data-download-trigger><i class="fa-solid fa-download"></i></a>
       </li>
       <li class="nav-item mt-auto">
         <a class="nav-link text-danger" href="{{ url_for('logout') }}" title="Sign Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
@@ -44,6 +43,30 @@
   <main class="main-content">
     {% block content %}{% endblock %}
   </main>
+
+  <div class="download-modal" id="download-modal" aria-hidden="true">
+    <div class="download-modal__overlay" data-download-dismiss></div>
+    <div class="download-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="download-modal-title" tabindex="-1">
+      <button type="button" class="download-modal__close" data-download-dismiss aria-label="Close download options"></button>
+      <div class="download-modal__content">
+        <h2 class="download-modal__title" id="download-modal-title">Download dashboard</h2>
+        <p class="download-modal__subtitle">Choose the format for your dashboard export.</p>
+        <div class="download-modal__actions">
+          <button type="button" class="download-modal__option" data-download-format="png">
+            <i class="fa-regular fa-file-image"></i>
+            <span>PNG image</span>
+          </button>
+          <button type="button" class="download-modal__option" data-download-format="pdf">
+            <i class="fa-regular fa-file-pdf"></i>
+            <span>PDF document</span>
+          </button>
+        </div>
+        <p class="download-modal__error" role="alert" data-download-error hidden></p>
+        <p class="download-modal__hint">The export includes dashboard visualisations and AI storyboard insights for your role.</p>
+      </div>
+    </div>
+  </div>
 </div>
+<script src="{{ url_for('static', filename='js/download-modal.js') }}" defer></script>
 {% block extra_scripts %}{% endblock %}
 {% endblock %}
